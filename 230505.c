@@ -3,26 +3,30 @@
 #include <stdlib.h>
 #include <string.h>
 #include <windows.h>
-//void swap(int* pfront, int* pback);
+void swap(int* pf, int* pb);
 
 int main()
 {
 	//배열 뒤집기 ex) hello ->olleh
 
-	int arr[6];
-	int size = sizeof(arr) / sizeof(*arr);
-	int* pf = arr + 1;
-	int* pb = arr + 6;
+	int arr[6] = { 1,2,3,4,5,6 };
+	int* pf = arr[1];
+	int* pb = arr[5];
+	int* pt = &total;
 
-	printf("정수 6개 입력 : ");
-	gets(arr);
-	for (int i = 1;i <= 6;i++)
-	{
-		
-		
-	}
-	puts(arr);
+	swap(&pf, &pb);
+	printf("출력 : %d%d", pf, pb);
+	
+	return 0;
 }
+void swap(int* pf, int* pb)
+{
+	int temp;
+		temp = *pf;
+		*pf = *pb;
+		*pb = temp;
+}
+
 
 //void swap(int* pfront, int* pback)
 
@@ -46,7 +50,7 @@ int main()
 				*(str+i - 1) = temp;
 				break;
 			}
-			*(str+i - 1) = *(str+i);
+			*(str + i - 1) = *(str + i);
 		}
 		puts(str);
 		Sleep(500);
