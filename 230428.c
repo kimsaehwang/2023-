@@ -4,6 +4,7 @@
 #include <string.h>
 int main()
 {
+	/*
 	int num;
 	int sum = 0;
 
@@ -13,7 +14,7 @@ int main()
 		printf("정수를 입력하시오 : ");
 		scanf("%d", &num);
 
-		sum = sum + num;
+		sum = sum + num;0
 	} while (num);
 
 	printf("정수의 합은 : %d\n", sum);
@@ -44,6 +45,7 @@ int main()
 	}
 
 	printf("정수의 합은 : %d\n", sum);
+	*/
 
 	//양의 정수의 배수구하기
 	/*
