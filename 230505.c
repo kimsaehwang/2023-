@@ -8,13 +8,13 @@ int main()
 {
 	//문자열 뒤집기 
 	char str[100];
-	int len; 
+	int len;
+	gets(str);
 	len = strlen(str);//문자열 길이갯수를 str에 저장
 	char* front = &str[0];
-	char* back = &str[99];
+	char* back = ;
 
-	gets(str);
-	
+
 	char temp;
 	for (int i = 0; i < len / 2; i++)
 	{
@@ -30,55 +30,52 @@ int main()
 }
 
 
-	//숫자뒤집기
-	/*
-	int arr[6] = { 1,2,3,4,5,6 };
-	int* front = &arr[0];
-	int* back = &arr[5];
-
-	int temp;
-
-	for (int i = 0; i < 3; i++)
-	{
-		temp = *(front+i);
-		*(front + i) = *(back - i);
-		*(back - i) = temp;
-	}
-
-	for (int i = 0; i <= 5; i++)
-	{
-		printf("%d", arr[i]);
-	}
-	return 0;
+//숫자뒤집기
+/*
+int arr[6] = { 1,2,3,4,5,6 };
+int* front = &arr[0];
+int* back = &arr[5];
+int temp;
+for (int i = 0; i < 3; i++)
+{
+	temp = *(front+i);
+	*(front + i) = *(back - i);
+	*(back - i) = temp;
+}
+for (int i = 0; i <= 5; i++)
+{
+	printf("%d", arr[i]);
+}
+return 0;
 }
 */
 
 
 
-	/*
-	//포인터를 활용한 광고판
-	char str[100];
-	int size = sizeof(str) / sizeof(*str);
-	printf("문자열 입력  -> ");
-	gets(str);
-	while (1)
+/*
+//포인터를 활용한 광고판
+char str[100];
+int size = sizeof(str) / sizeof(*str);
+printf("문자열 입력  -> ");
+gets(str);
+while (1)
+{
+	int temp;
+	temp = *str;
+	for (int i = 1;i < size;i++)
 	{
-		int temp;
-		temp = *str;
-		for (int i = 1;i < size;i++)
+		if (*(str+i) == '\0')
 		{
-			if (*(str+i) == '\0')
-			{
-				*(str+i - 1) = temp;
-				break;
-			}
-			*(str + i - 1) = *(str + i);
+			*(str+i - 1) = temp;
+			break;
 		}
-		puts(str);
-		Sleep(500);
-		system("cls");
+		*(str + i - 1) = *(str + i);
 	}
-	return 0;
+	puts(str);
+	Sleep(500);
+	system("cls");
+}
+return 0;
 }
 */
 
