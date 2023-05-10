@@ -5,41 +5,45 @@
 
 int main(void)
 {
+	//2차원 배열 가로세로합
+	/*
 	int i, j;
-	int matrix[5][6] = { {1,2,3,4,5},{6,7,8,9,10},{11,12,13,14,15},{16,17,18,19,20} };
-	int tot;
+	int matrix[5][6] = { {1,2,3,4,5},
+						{6,7,8,9,10},
+						{11,12,13,14,15},
+						{16,17,18,19,20} };
 
-	
-
-	for (i = 0;i < 5;i++)
+	for (i = 0; i < 4; i++)
 	{
-		for (j = 0;j < 6;j++)
+		for (j = 0; j < 5; j++)
+		{
+			matrix[i][5] += matrix[i][j];
+			matrix[4][j] += matrix[i][j];
+			matrix[4][5] += matrix[i][j];
+		}
+	}
+
+	for (i = 0; i < 5; i++)
+	{
+		for (j = 0; j < 6; j++)
 		{
 			printf("%4d", matrix[i][j]);
 		}
 		printf("\n");
 	}
-
-	for (i = 0;i < 5;i++)
-	{
-		tot = 0;
-		for (j = 0;j < 6;j++)
-		{
-			tot += matrix[i][j];
-		}
-		printf("%d\n",tot);
-	}
 	return 0;
 }
+*/
 
-	//Q2 
+	//Q2 2차원 배열 달팽이
 	/*
-	int n, m, size;
-	int a = 1;
 	int matrix[50][50];
-	int i, j;
-	printf("size : ");
-	scanf("%d%d", &n,&m);
+	int n, m;
+
+	printf("행과열 입력 : ");
+	scanf("%d%d", &n, &m);
+
+	int i = 0, j = 0, max = 1;
 
 	for (i = 0;i < n;i++)
 	{
@@ -52,36 +56,44 @@ int main(void)
 	i = 0;
 	j = 0;
 	matrix[i][j] = 1;
-	a = 2;
-	while (a <= n * m)
+	max = 2;
+
+	while (max <= n * m)
 	{
-		a++;
-		while (a > j + i  == 0)
+		while (j + 1 < m && matrix[i][j + 1] == 0)
 		{
 			j++;
-			matrix[i][j] = a;
-			
+			matrix[i][j] = max;
+			max++;
 		}
-		
-
-
+		while (i + 1 < n && matrix[i + 1][j] == 0)
+		{
+			i++;
+			matrix[i][j] = max;
+			max++;
+		}
+		while (j - 1 >= 0 && matrix[i][j - 1] == 0)
+		{
+			j--;
+			matrix[i][j] = max;
+			max++;
+		}
+		while (i - 1 >= 0 && matrix[i - 1][j] == 0)
+		{
+			i--;
+			matrix[i][j] = max;
+			max++;
+		}
 	}
-
-
-
 
 	for (i = 0;i < n;i++)
 	{
 		for (j = 0;j < m;j++)
 		{
 			printf("%3d", matrix[i][j]);
-			
 		}
-	printf("\n");
+		printf("\n");
 	}
-
-	
-
 }
 */
 
@@ -102,8 +114,8 @@ int main(void)
 		printf("\n");
 	}
 	return 0;
-}
-*/
+	}
+	*/
 
 	//포인터 배열
 	/*
@@ -121,13 +133,13 @@ int main(void)
 		printf("%s\n", pary[i]);
 	}
 	return 0;
-}
-*/
+	}
+	*/
 
 	//Q1 행렬 프로그램 작성
 	/*int i, j, m, n;
 	int matrix[5][5];
-	
+
 	printf("행입력 : ");
 	scanf("%d", &m);
 	printf("열입력 : ");
@@ -142,7 +154,7 @@ int main(void)
 		}
 	}
 	printf("\n");
-	
+
 	for (i = 0;i < n;i++)
 	{
 		for (j = m - 1;j >= 0;j--)
@@ -151,7 +163,7 @@ int main(void)
 		}
 		printf("\n");
 	}
-}*/
+	}*/
 
 	//3차원 배열 2반의 3명의 4과목점수
 	/*
@@ -175,7 +187,7 @@ int main(void)
 		printf("\n");
 	}
 	return 0;
-}*/
+	}*/
 
 	//char 배열 ex
 	/*
@@ -194,8 +206,8 @@ int main(void)
 		printf("%s", animal[i]);
 	}
 	return 0;
-}
-*/
+	}
+	*/
 
 	//학생3명의 4과목 총점,평균
 	/*
