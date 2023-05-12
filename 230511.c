@@ -13,7 +13,7 @@
 
 int main(void)
 {
-	//Q4.문자열 역으로 출력하기(메모리 할당 내용복사 연습)
+	//Q4.문자열 역으로 출력하기(메모리 할당 내용복사 연습) x
 	/*
 	char str[100];
 	char temp;
@@ -31,7 +31,7 @@ int main(void)
 	{
 		printf("입력 >> ");
 		scanf("%c", &str);
-		if (str == "Quit");
+		if (str == "Quit")break;
 		if (count == size)
 		{
 			size += 5;
@@ -101,7 +101,7 @@ int main(void)
 	return 0;
 }*/
 
-	//448p 실전예제
+	//448p 실전예제 x
 	/*
 	int age, age1;
 	double height, height1;
@@ -189,7 +189,7 @@ int sum(int a, int b)
 }
 */
 
-	//Q2 int *maxptr; int *minptr; int arr[5];
+	//Q2 int *maxptr; int *minptr; int arr[5]; o
 	/*
 	int arr[5] = { 1,2,3,4,5 };
 	int* maxptr = &arr[4]; 
@@ -257,46 +257,55 @@ void swap_ptr(char** ppa, char** ppb)
 }
 */
 
-	//숫자야구
+	//숫자야구 x
 	/*
 	int i, j, k;
-	int count[3];
+	int computer[3];
 	srand((unsigned int)time(NULL));
 
 	for (i = 0; i < 3; i++) {
-		count[i] = rand() % 9 + 1;
+		computer[i] = rand() % 9 + 1;
 
 		for (j = 0; j < i; j++) {
-			if (count[i] == count[j]) {
+			if (computer[i] == computer[j]) {
 				i--;  //중복이 발견될 경우 i번째 숫자를 다시 뽑는다.
 				break;
 			}
 		}
 	}
 	for (k = 0; k < 3; k++) {
-		printf("%d ", count[k]);
+		printf("%d ", computer[k]);
 	}
 	printf("\n");
 
 	int st = 0;
 	int	ba = 0;
 	int cnt = 1;
-	int num[3];
+	int user[3];
 
-	while (count[i] == num[3])
+	while (1)
 	{
-		printf("%d회 >> %ds%db", cnt,st,ba);
-		scanf("%d", num[3]);
+		printf("\n%d회 >> ", cnt);
+		scanf("%d%d%d", &user[1], &user[2], &user[3]);
 		cnt++;
-
-		if (count[0] == num[0])
+		
+		st = 0;
+		ba = 0;
+		for (i = 0;i < 3;i++)
 		{
-			ba++;
+			for (j = 0;j < 3;j++)
+			{
+				if (computer[i] == user[j])
+					if (i == j)st++;
+					else ba++;
+			}
 		}
-
-		
-	
-		
+		printf("%ds %db", st, ba);
 	}
+	if (st == 3)
+	{
+		printf("HR");
+	}
+	return 0;
 }
 */
