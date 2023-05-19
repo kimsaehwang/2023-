@@ -1,3 +1,5 @@
+﻿
+int k;
 ﻿#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,7 +34,7 @@ int main()
 		{
 			infoDraw();
 		}
-		else if (menucode == 2) 
+		else if (menucode == 2)
 		{
 			return 0;
 		}
