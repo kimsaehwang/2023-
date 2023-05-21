@@ -1,46 +1,43 @@
-ï»¿#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <windows.h>ï»¿
-#define UP 0
-#define DOWN 1
-#define LEFT 2
-#define RIGHT 3
+#include <windows.h>
+#define UP 72
+#define DOWN 80
+#define LEFT 75
+#define RIGHT 77
 #define SUBMIT 4
 
-int KeyControl();
-void init();
+int badukdol[20][20] = { 0 };
+int dol = 1;
+char key;
+int x = 20, y = 10;
 void Title();
-int omok();
 int menudraw();
 void infoDraw();
 int omokDraw();
-void gotoxy(int x, int y);
-
-enum
-{
-	YELLOW, VIOLET,GREEN
-};
-
-void setColor(unsigned short text) {
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), text);
-}
+void draw_badukpan(); //¹ÙµÏÆÇ±×¸®´ÂÇÔ¼ö
+void gotoxy(int x, int y); //Ä¿¼­ÀÌµ¿ÇÔ¼ö  
+void draw_dol(); // ¹ÙµÏµ¹±×¸®´ÂÇÔ¼ö 
+void erase_dol(int x, int y); // ¹ÙµÏµ¹Áö¿ì´ÂÇÔ¼ö 
+void insert_key(char key, int* x, int* y); // Å°ÀÔ·Â¹Þ´Â ÇÔ¼ö 
+void put_spacebar(int badukdol[][20], int x, int y); // ¹ÙµÏµ¹³õ´ÂÇÔ¼ö
+void draw_badukdol(int badukdol[][20]); // ¹ÙµÏµ¹±×¸®´ÂÇÔ¼ö 
+int winner(int badukdol[][30]);
+void play();
+void CursorView();
 
 void CursorView()
 {
 	CONSOLE_CURSOR_INFO cursorInfo = { 0, };
-	cursorInfo.dwSize = 1; //ì»¤ì„œ êµµê¸° (1 ~ 100)
-	cursorInfo.bVisible = 0; //ì»¤ì„œ Visible TRUE(ë³´ìž„) FALSE(ìˆ¨ê¹€)
+	cursorInfo.dwSize = 1; //Ä¿¼­ ±½±â (1 ~ 100)
+	cursorInfo.bVisible = 0; //Ä¿¼­ on/off
 	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
-
 }
 
-int main()
-{
+void main() {
+	printf("\n");
+	Title();
 	while (1)
 	{
-		Title();
 		int menucode = menudraw();
 		if (menucode == 0)
 		{
@@ -48,11 +45,11 @@ int main()
 			int omokcode = omokDraw();
 			if (omokcode == 0)
 			{
-				omok();
+				play();
 			}
 			else if (menucode == 1)
 			{
-				return 0;
+				return Title;
 			}
 			else if (menucode == 2)
 			{
@@ -68,14 +65,11 @@ int main()
 			return 0;
 		}
 		system("cls");
-		printf("ìž…ë ¥í•œ í‚¤ê°’ì€ : %d\n", menucode);
 	}
-	return 0;
 }
 
 void Title()
 {
-	setColor(GREEN);
 	printf("\n\n");
 	printf("           #####  #     #  #####  #    #       \n");
 	printf("          #     # ##   ## #     # #   #        \n");
@@ -84,24 +78,6 @@ void Title()
 	printf("          #     # #     # #     # #  #         \n");
 	printf("          #     # #     # #     # #   #        \n");
 	printf("           #####  #     #  #####  #    #       \n");
-	
-}
-
-void gotoxy(int x, int y)
-{
-	COORD pos = { x,y };
-	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
-}
-
-int KeyControl()
-{
-	char temp = getch();
-
-	if (temp == 'w' || temp == 'W') return UP;
-	else if (temp == 'a' || temp == 'a') return LEFT;
-	else if (temp == 'd' || temp == 'd') return RIGHT;
-	else if (temp == 's' || temp == 's') return DOWN;
-	else if (temp == ' ') return SUBMIT;
 
 }
 
@@ -110,11 +86,11 @@ int menudraw()
 	int x = 20;
 	int y = 12;
 	gotoxy(x - 2, y);
-	printf("> ê²Œ ìž„ ì‹œ ìž‘ ");
+	printf("> °Ô ÀÓ ½Ã ÀÛ ");
 	gotoxy(x, y + 1);
-	printf("ê²Œ ìž„ ì • ë³´ ");
+	printf("°Ô ÀÓ Á¤ º¸ ");
 	gotoxy(x, y + 2);
-	printf("   ì¢… ë£Œ  ");
+	printf("   Á¾ ·á  ");
 
 	while (1)
 	{
@@ -155,13 +131,13 @@ int menudraw()
 void infoDraw()
 {
 	system("cls");
-	printf("\n\n");
-	printf("                   [ì¡°ìž‘ë²•]\n\n");
-	printf("              ì´ ë™ : W, A, S, D\n");
-	printf("           ëŒ ë†“ ê¸° : ìŠ¤ íŽ˜ ì´ ìŠ¤ ë°”\n");
-	printf("        ìŠ¹ ë¦¬ ì¡° ê±´ : ê°™ì€ìƒ‰ 5ê°œê°€ ì´ì–´ì§€ë©´ ì´ê¹€\n\n");
-	printf("           spacebar ëˆ„ë¥´ë©´ ëŒì•„ê°");
-	printf("           ì œ ìž‘ ìž : ê¹€ ì„¸ í™©");
+	printf("\n");
+	printf("                   [Á¶ÀÛ¹ý]\n\n");
+	printf("              ÀÌ µ¿ : ¹æ Çâ Å°\n");
+	printf("           µ¹ ³õ ±â : ½º Æä ÀÌ ½º ¹Ù\n\n");
+	printf("        ½Â ¸® Á¶ °Ç : °°Àº»ö 5°³°¡ ÀÌ¾îÁö¸é ÀÌ±è\n\n");
+	printf("           spacebar ´©¸£¸é ¹ÙµÏµ¹ ³õÀ½\n");
+	printf("           Á¦ ÀÛ ÀÚ : ±è ¼¼ È²");
 	while (1)
 	{
 		if (KeyControl() == SUBMIT) break;
@@ -175,17 +151,17 @@ int omokDraw()
 	system("cls");
 
 	gotoxy(x - 2, y);
-	printf("> 2 ì¸ ìš© ");
+	printf("> 2 ÀÎ ¿ë ");
 	gotoxy(x, y + 1);
-	printf("1 ì¸ ìš© (ì¤€ë¹„ì¤‘)");
+	printf("1 ÀÎ ¿ë (ÁØºñÁß)");
 	gotoxy(x, y + 2);
-	printf(" ë’¤ ë¡œ  ");
+	printf(" µÚ ·Î  ");
 
 	while (1)
 	{
 		int n = KeyControl();
 		switch (n) {
-		case UP:
+		case 72:
 		{
 			if (y > 6)
 			{
@@ -197,7 +173,7 @@ int omokDraw()
 			break;
 		}
 
-		case DOWN:
+		case 80:
 		{
 			if (y < 8)
 			{
@@ -211,89 +187,271 @@ int omokDraw()
 
 		case SUBMIT:
 		{
-			return y - 6;
+			return 0;
 		}
 		}
 	}
 }
 
-int omok()
-{
+void play() {
+
+	draw_badukpan();
+	gotoxy(x, y);
+	draw_dol();
+
+	do {
+		key = getch();
+		erase_dol(x, y);
+		insert_key(key, &x, &y);
+		draw_badukdol(badukdol);
+		if (winner(badukdol))
+		{
+			break;
+		}
+		gotoxy(x, y);
+		draw_dol();
+	} while (key != 27);
+
+};
+
+void draw_badukpan() {
 	system("cls");
 	printf("\n\n");
-	
-	printf("â”Œâ”€â”¬â”€â”¬â”€â”¬â”€â”¬â”€â”¬â”€â”¬â”€â”¬â”€â”¬â”€â”¬â”€â”¬â”€â”¬â”€â”¬â”€â”¬â”€â”¬â”€â”¬â”€â”¬â”€â”¬â”€â”¬â”€â”\n");
+
+	printf("¦£¦¡¦¨¦¡¦¨¦¡¦¨¦¡¦¨¦¡¦¨¦¡¦¨¦¡¦¨¦¡¦¨¦¡¦¨¦¡¦¨¦¡¦¨¦¡¦¨¦¡¦¨¦¡¦¨¦¡¦¨¦¡¦¨¦¡¦¨¦¡¦¨¦¡¦¤\n");
 	for (int i = 0;i < 18;i++)
 	{
-		printf("â”œâ”€â”¼â”€â”¼â”€â”¼â”€â”¼â”€â”¼â”€â”¼â”€â”¼â”€â”¼â”€â”¼â”€â”¼â”€â”¼â”€â”¼â”€â”¼â”€â”¼â”€â”¼â”€â”¼â”€â”¼â”€â”¼â”€â”¤\n");
-	}
-	printf("â””â”€â”´â”€â”´â”€â”´â”€â”´â”€â”´â”€â”´â”€â”´â”€â”´â”€â”´â”€â”´â”€â”´â”€â”´â”€â”´â”€â”´â”€â”´â”€â”´â”€â”´â”€â”´â”€â”˜\n\n");
+		printf("¦§¦¡¦«¦¡¦«¦¡¦«¦¡¦«¦¡¦«¦¡¦«¦¡¦«¦¡¦«¦¡¦«¦¡¦«¦¡¦«¦¡¦«¦¡¦«¦¡¦«¦¡¦«¦¡¦«¦¡¦«¦¡¦«¦¡¦©\n");
+	} 
+	printf("¦¦¦¡¦ª¦¡¦ª¦¡¦ª¦¡¦ª¦¡¦ª¦¡¦ª¦¡¦ª¦¡¦ª¦¡¦ª¦¡¦ª¦¡¦ª¦¡¦ª¦¡¦ª¦¡¦ª¦¡¦ª¦¡¦ª¦¡¦ª¦¡¦ª¦¡¦¥\n\n");
+}
 
-	
+int KeyControl()
+{
+	char temp = getch();
 
-	//printf("â—‹ : %d  â— : %d", );
-	int x = 38;     //0~38 ì§ìˆ˜ë§Œ
-	int y = 2;      //2~21
-	int m = 2;
-	gotoxy(x , y);
-	while (1)
+	if (temp == 'w' || temp == 'W') return UP;
+	else if (temp == 'a' || temp == 'a') return LEFT;
+	else if (temp == 'd' || temp == 'd') return RIGHT;
+	else if (temp == 's' || temp == 's') return DOWN;
+	else if (temp == ' ') return SUBMIT;
+
+}
+
+void gotoxy(int x, int y)
+{
+	COORD Pos;
+	Pos.X = x;
+	Pos.Y = y;
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), Pos);
+}
+
+void draw_dol() 
+{
+	if (dol == 1)
 	{
-		int cnt;
-		int n = KeyControl();
-		switch (n) {
-		case UP:
-		{
-			if (y > 2)
-			{
-				gotoxy(x - 2, y);
-				//printf(" ");
-				gotoxy(x - 2, --y);
+		printf("¡Û");
+	}
+	else {
+		printf("¡Ü");
+	}
+};
 
-			}
-			break;
-		}
+void erase_dol(int x, int y)
+{
+	gotoxy(x, y);
+	if (x == 0 && y == 0)
+	{
+		printf("¦£");
+	}
+	else if (x == 42 && y == 0)
+	{
+		printf("¦¤");
+	}
+	else if (x == 0 && y == 21)
+	{
+		printf("¦¦");
+	}
+	else if (x == 42 && y == 21)
+	{
+		printf("¦¥");
+	}
+	else if (x == 0)
+	{
+		printf("¦§");
+	}
+	else if (y == 0)
+	{
+		printf("¦¨");
+	}
+	else if (x == 42)
+	{
+		printf("¦©");
+	}
+	else if (y == 21)
+	{
+		printf("¦ª");
+	}
+	else
+	{
+		printf("¦«");
+	}
 
-		case DOWN:
-		{
-			if (y < 21)
-			{
-				gotoxy(x - 2, y);
-				//printf(" ");
-				gotoxy(x - 2, ++y);
-			}
-			break;
-		}
+}
 
-		case LEFT:
-		{
-			if (x > 0)
-			{
-				gotoxy(x, y);
-				//printf(" ");
-				x -= 2;
-				gotoxy(x, y);
-			}
-			break;
-		}
+void insert_key(char key, int* x, int* y) 
+{
+	switch (key) {
+	case 75: if (*x - 2 < 0) {
+		break;
+	}
+		   else { *x -= 2; }
+		   printf(" ");
+		   break; // ¿ÞÂÊ
+	case 77: if (*x + 2 > 38)
+	{
+		break;
+	}
+		   else {
+		*x += 2;
+	}
+		   printf(" ");
+		   break; // ¿À¸¥ÂÊ
+	case 72: if (*y - 1 < 2)
+	{
+		break;
+	}
+		   else {
+		*y -= 1;
+	}
+		   printf(" ");
+		   break; // À§ÂÊ
+	case 80: if (*y + 1 > 21)
+	{
+		break;
+	}
+		   else {
+		*y += 1;
+	}
+		   printf(" ");
+		   break; // ¾Æ·¡ÂÊ
+	case 32: put_spacebar(badukdol, *x, *y); // ½ºÆäÀÌ½º¹Ù
+		break;
 
-		case RIGHT:
-		{
-			if (x < 38)
-			{
-				gotoxy(x, y);
-				//printf(" ");
-				x += 2;
-				gotoxy(x, y);
-			}
-			break;
-		}
+	default:
+		break;
+	}
+}
 
-		case SUBMIT:
+void put_spacebar(int badukdol[][20], int x, int y)
+{
+	if (badukdol[y][x / 2] == 0)
+	{
+		if (dol == 1)
 		{
-			
-			printf("â—");
-		
+			badukdol[y][x / 2] = 1;
+			dol = 2;
 		}
+		else
+		{
+			badukdol[y][x / 2] = 2;
+			dol = 1;
 		}
 	}
+}
+
+void draw_badukdol(int badukdol[][20])
+{
+	for (int i = 0; i < 20; i++)
+	{
+		for (int j = 0; j < 20; j++)
+		{
+			if (badukdol[j][i] == 1)
+			{
+				gotoxy(i * 2, j);
+				printf("¡Û");
+				printf("\n\n\n\n\t\t\t\t\t Èæµ¹Â÷·ÊÀÔ´Ï´Ù.");
+			}
+			else if (badukdol[j][i] == 2)
+			{
+				gotoxy(i * 2, j);
+				printf("¡Ü");
+				printf("\n\n\n\n\t\t\t\t\t ¹éµ¹Â÷·ÊÀÔ´Ï´Ù.");
+			}
+		}
+	}
+}
+
+int winner(int badukdol[][20])
+{
+	for (int i = 0; i < 20; i++)
+	{
+		for (int j = 0; j < 20; j++)
+		{
+			if (badukdol[i][j] == 1 && badukdol[i][j + 1] == 1 && badukdol[i][j + 2] == 1 && badukdol[i][j + 3] == 1 && badukdol[i][j + 4] == 1)
+			{
+				gotoxy(20, 10);
+				printf("\t\t\t\t\t[Èæµ¹ ½Â¸®]");
+				
+				return 0;
+			}// Èæµ¹ °¡·Î
+			else if (badukdol[i][j] == 2 && badukdol[i][j + 1] == 2 && badukdol[i][j + 2] == 2 && badukdol[i][j + 3] == 2 && badukdol[i][j + 4] == 2)
+			{
+				gotoxy(20, 10);
+				printf("\t\t\t\t\t[¹éµ¹ ½Â¸®]");
+				getch();
+				return 0;
+			}//¹éµ¹ °¡·Î
+
+			else if (badukdol[j][i] == 1 && badukdol[j + 1][i] == 1 && badukdol[j + 2][i] == 1 && badukdol[j + 3][i] == 1 && badukdol[j + 4][i] == 1)
+			{
+				gotoxy(20, 10);
+				printf("\t\t\t\t\t[Èæµ¹ ½Â¸®]");
+				getch();
+				return 0;
+			} //Èæµ¹ ¼¼·Î
+			else if (badukdol[j][i] == 2 && badukdol[j + 1][i] == 2 && badukdol[j + 2][i] == 2 && badukdol[j + 3][i] == 2 && badukdol[j + 4][i] == 2)
+			{
+				gotoxy(20, 10);
+				printf("\t\t\t\t\t[¹éµ¹ ½Â¸®]");
+				getch();
+				return 0;
+			}//¹éµ¹ ¼¼·Î
+
+			else if (badukdol[i][j] == 1 && badukdol[i + 1][j + 1] == 1 && badukdol[i + 2][j + 2] == 1 && badukdol[i + 3][j + 3] == 1 && badukdol[i + 4][j + 4] == 1)
+			{
+				gotoxy(20, 10);
+				printf("\t\t\t\t\t[Èæµ¹ ½Â¸®]");
+				getch();
+				return 0;
+			}// Èæµ¹ ¿ÞÂÊÀ§´ë°¢¼±
+
+			else if (badukdol[i][j] == 2 && badukdol[i + 1][j + 1] == 2 && badukdol[i + 2][j + 2] == 2 && badukdol[i + 3][j + 3] == 2 && badukdol[i + 4][j + 4] == 2)
+			{
+				gotoxy(20, 10);
+				printf("\t\t\t\t\t[¹éµ¹ ½Â¸®]");
+				getch();
+				return 0;
+			}// ¹éµ¹ ¿ÞÂÊÀ§°¢¼±
+
+			else if (badukdol[19 - j][i] == 1 && badukdol[18 - j][i + 1] == 1 && badukdol[17 - j][i + 2] == 1 && badukdol[16 - j][i + 3] == 1 && badukdol[15 - j][i + 4] == 1)
+			{
+				gotoxy(20, 10);
+				printf("\t\t\t\t\t[Èæµ¹ ½Â¸®]");
+				getch();
+				return 0;
+			} //Èæµ¹ ¾Æ·¡ÂÊ´ë°¢¼±
+
+			else if (badukdol[19 - j][i] == 2 && badukdol[18 - j][i + 1] == 2 && badukdol[17 - j][i + 2] == 2 && badukdol[16 - j][i + 3] == 2 && badukdol[15 - j][i + 4] == 2)
+			{
+				gotoxy(20, 10);
+				printf("\t\t\t\t\t[¹éµ¹ ½Â¸®]");
+				getch();
+				return 0;
+			} //¹éµ¹ ¾Æ·¡ÂÊ´ë°¢¼±
+
+		}
+		
+	}
+	return 0;
 }
