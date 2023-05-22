@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <windows.h>
 #define UP 72
@@ -23,6 +24,7 @@ void insert_key(char key, int* x, int* y);
 void put_spacebar(int badukdol[][20], int x, int y); 
 void draw_badukdol(int badukdol[][20]);  
 int winner(int badukdol[][20]);
+int rule(int badukdol[][20]);
 
 //커서 굵기,끄기 함수
 void CursorView()
@@ -33,9 +35,22 @@ void CursorView()
 	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
 }
 
+//커서이동함수
+int KeyControl()
+{
+	char temp = getch();
+
+	if (temp == '72') return UP;
+	else if (temp == '85') return LEFT;
+	else if (temp == '75') return RIGHT;
+	else if (temp == '77') return DOWN;
+	else if (temp == ' ') return SUBMIT;
+
+}
+
 void main() {
 	printf("\n");
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 6);
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 6);//색 바꾸기
 	
 	while (1)
 	{
@@ -48,6 +63,7 @@ void main() {
 			if (omokcode == 0)
 			{
 				play();
+				return 0;
 			}
 			else if (menucode == 1)
 			{
@@ -68,6 +84,7 @@ void main() {
 		}
 		system("cls");
 	}
+	return 0;
 }
 
 void Title()
@@ -201,20 +218,20 @@ int omokDraw()
 //오목실행 함수
 void play() {
 	char key;
+
 	draw_badukpan();
 	gotoxy(x, y);
 
-	do {
+	while (1)
+	{
+		gotoxy(x, y);
 		key = getch();
 		erase_dol(x, y);
 		insert_key(key, &x, &y);
 		draw_badukdol(badukdol);
-		if (winner(badukdol))return 0;
-		
-
-		gotoxy(x, y);
-	} while (key != 27);
-
+		rule(badukdol);
+	}
+	return 0;
 }
 
 //바둑판그리는함수
@@ -228,19 +245,6 @@ void draw_badukpan() {
 		printf("├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤\n");
 	} 
 	printf("└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘\n\n");
-}
-
-//커서이동함수
-int KeyControl()
-{
-	char temp = getch();
-
-	if (temp == '72') return UP;
-	else if (temp == '85') return LEFT;
-	else if (temp == '75') return RIGHT;
-	else if (temp == '77') return DOWN;
-	else if (temp == ' ') return SUBMIT;
-
 }
 
 //커서이동함수
@@ -355,6 +359,10 @@ void put_spacebar(int badukdol[][20], int x, int y)
 			badukdol[y][x / 2] = 2;
 			dol = 1;
 		}
+		if (winner(badukdol))
+		{
+			return 0;
+		}
 	}
 }
 
@@ -385,63 +393,88 @@ int winner(int badukdol[][20])
 {
 	for (int i = 0; i < 20; i++)
 	{
-		for (int j = 0; j < 20; j++)//badukdol[i][j] = 1 -> 흑돌 || badukdol[i][j] = 1 -> 백돌
+		for (int j = 0; j < 20; j++)//badukdol[i][j] = 1 -> 흑돌 || badukdol[i][j] = 2 -> 백돌
 		{
 			if (badukdol[i][j] == 1 && badukdol[i][j + 1] == 1 && badukdol[i][j + 2] == 1 && badukdol[i][j + 3] == 1 && badukdol[i][j + 4] == 1)
 			{
-				gotoxy(40, 10);
+				gotoxy(1, 23);
 				printf("[흑돌 승리]");
-				return 0;
+				exit(0);
 			}// 흑돌 가로
+
 			else if (badukdol[i][j] == 2 && badukdol[i][j + 1] == 2 && badukdol[i][j + 2] == 2 && badukdol[i][j + 3] == 2 && badukdol[i][j + 4] == 2)
 			{
-				gotoxy(40, 10);
-				printf("[백돌 승리]");	
-
-				return 0;
+				gotoxy(1, 23);
+				printf("[백돌 승리]");
+				exit(0);
 			}//백돌 가로
 
 			else if (badukdol[j][i] == 1 && badukdol[j + 1][i] == 1 && badukdol[j + 2][i] == 1 && badukdol[j + 3][i] == 1 && badukdol[j + 4][i] == 1)
 			{
-				gotoxy(40, 10);
-				printf("[흑돌 승리]");			
-				return 0;
+				gotoxy(1, 23);
+				printf("[흑돌 승리]");
+				exit(0);
 			} //흑돌 세로
+
 			else if (badukdol[j][i] == 2 && badukdol[j + 1][i] == 2 && badukdol[j + 2][i] == 2 && badukdol[j + 3][i] == 2 && badukdol[j + 4][i] == 2)
 			{
-				gotoxy(40, 10);
-				printf("[백돌 승리]");			
-				return 0;
+				gotoxy(1, 23);
+				printf("[백돌 승리]");
+				exit(0);
 			}//백돌 세로
 
 			else if (badukdol[i][j] == 1 && badukdol[i + 1][j + 1] == 1 && badukdol[i + 2][j + 2] == 1 && badukdol[i + 3][j + 3] == 1 && badukdol[i + 4][j + 4] == 1)
 			{
-				gotoxy(40, 10);
+				gotoxy(1, 23);
 				printf("[흑돌 승리]");
-				return 0;
+				exit(0);
 			}// 흑돌 왼쪽위대각선
 
 			else if (badukdol[i][j] == 2 && badukdol[i + 1][j + 1] == 2 && badukdol[i + 2][j + 2] == 2 && badukdol[i + 3][j + 3] == 2 && badukdol[i + 4][j + 4] == 2)
 			{
-				gotoxy(40, 10);
+				gotoxy(1, 23);
 				printf("[백돌 승리]");
-				return 0;
+				exit(0);
 			}// 백돌 왼쪽위각선
 
 			else if (badukdol[19 - j][i] == 1 && badukdol[18 - j][i + 1] == 1 && badukdol[17 - j][i + 2] == 1 && badukdol[16 - j][i + 3] == 1 && badukdol[15 - j][i + 4] == 1)
 			{
-				gotoxy(40, 10);
+				gotoxy(1, 23);
 				printf("[흑돌 승리]");
-				return 0;
+				exit(0);
 			} //흑돌 아래쪽대각선
 
 			else if (badukdol[19 - j][i] == 2 && badukdol[18 - j][i + 1] == 2 && badukdol[17 - j][i + 2] == 2 && badukdol[16 - j][i + 3] == 2 && badukdol[15 - j][i + 4] == 2)
 			{
-				gotoxy(40, 10);
+				gotoxy(1, 23);
 				printf("[백돌 승리]");
-				return 0;
+				exit(0);
 			} //백돌 아래쪽대각선
 		}
 	}
 	return 0;
+}
+
+//33규칙
+
+int rule(int badukdol[][20])
+{
+	for (int i = 0; i < 20; i++)
+	{
+		for (int j = 0; j < 20; j++)//badukdol[i][j] = 1 -> 흑돌 || badukdol[i][j] = 2 -> 백돌
+		{
+			if (badukdol[i][j] == 1 && badukdol[i][j + 1] == 1 && badukdol[j - 1][i - 1] == 1 && badukdol[j - 2][i - 1] == 1)
+			{
+				gotoxy(40, 10);
+				printf("흑돌 3 3 입니다.");
+			}// 흑돌 
+			else if (badukdol[i][j] == 2 && badukdol[i][j + 1] == 2 && badukdol[j - 1][i - 1] == 2 && badukdol[j - 2][i - 1] == 2)
+			{
+				gotoxy(40, 10);
+				printf("백돌 3 3 입니다.");
+			}// 백돌
+
+		}
+
+	}
 }
