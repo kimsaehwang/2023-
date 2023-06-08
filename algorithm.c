@@ -1,10 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <windows.h>
-#ifndef ___Intstack
-#define ___Intstack
+#include "IntQueue.h"
+
 /*
 int int_cmp(const int* a, const int* b)
 {
@@ -14,18 +11,68 @@ int int_cmp(const int* a, const int* b)
 		return 1;
 	else
 		return 0;
-}*/
-//int bin_search2(const int a[], int n, int key);
+}
+int bin_search2(const int a[], int n, int key);
 
 typedef struct
 {
 	int max;
 	int ptr;
 	int* stk;
-}Intstack;
+}Intstack;*/
+
+
+
 int main(void)
 {
-	IntStack s;
+	IntQueue que;
+
+	if (Initialize(&que, 64) == -1)
+	{
+		puts("큐의 생성에 실패했습니다.");
+		return 1;
+	}
+	while (1)
+	{
+		int m, x;
+
+		printf("현재 데이터 수: %d / %d \n", Size(&que), Capacity(&que));
+		printf("(1)인큐 (2)디큐 (3)피크 (4)출력 (0)종료: ");
+		scanf("%d", &m);
+
+		if (m == 0)break;
+		switch (m)
+		{
+		case1:
+			printf("데이터: ");scanf("%d", &x);
+			if (Enque(&que, x) == -1)
+				puts("\a오류: 인큐에 실패하였습니다.");
+			break;
+
+		case2:
+			if (Degue(&que, &x) == -1)
+				puts("\a오류: 디큐에 실패하였습니다.");
+			else
+				printf("디큐한 데이터는 %d입니다.\n", x);
+			break;
+
+		case3:
+			if (Peek(&que, &x) == -1)
+				puts("\a오류: 피크에 실패하였습니다.");
+			else
+				printf("피크한 데이터는 %d입니다.\n", x);
+			break;
+
+		case4:
+			Printf(&que);
+			break;
+		}
+	}
+	Terminate(&que);
+	return 0;
+}
+	//스택
+	/*IntStack s;
 	if (Initialize(&s, 64) == -1)
 	{
 		puts("스택 생성에 실패했습니다.");
@@ -66,7 +113,7 @@ int main(void)
 	}
 	Terminate(&s);
 	return 0;
-}
+}*/
 	//오름차순
 	/*int nx, ky;
 	puts("bsearch 함수를 사용하여 검색");
