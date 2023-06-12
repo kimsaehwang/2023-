@@ -1,6 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include<iostream>
-#include "mytime0.h"
+#include "cVector.h"
 
 //연산자 오버로딩
 /*
@@ -77,10 +77,25 @@ int main()
 		 v1 에 3 을 곱 : 3 6 9
 		 v2 에 2 를 나눔 : -2 -2.5 3
 		 두 벡터의 dot   : xx
-	 	 두 벡터의 cross : 27 -18 3
+		 두 벡터의 cross : 27 -18 3
 		 두 벡터의 사이각 : 83.0023
 	*/
-
+	using namespace std;
+	double x, y, z;
+	cout << "> v1 x, y, z : ";
+	cin >> x >> y >> z;
+	cVector v1(x, y, z);
+	cout << "> v2 x, y, z : ";
+	cin >> x >> y >> z;
+	cVector v2(x, y, z);
+	cout << "v1 length : " << v1.length() <<endl;
+	cout << "v2 length : " << v2.length() <<endl;
+	cout << "v1에 3을 곱 : " << v1 * 3 << endl;
+	cout << "v2에 2로 나눔 : " << v2 / 2 << endl;
+	cout << "두 벡터의 Dot : " << v1.Dot(v2) << endl;
+	cout << "두 벡터의 Cross : "<< v1.Cross(v2) << endl;
+	cout << "두 벡터의 사이각 : "<< v1.Angle(v2) << endl;
+}
 	//연산자 오버로딩
 	/*using std::cout;
 	using std::endl;
