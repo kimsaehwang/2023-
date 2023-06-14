@@ -191,6 +191,7 @@ char* left(const char* str, int n)
 	return 0;
 }*/
 
+    //¿ø
 	/*using namespace std;
 	int r, x, y;
 	int x0 = 0;

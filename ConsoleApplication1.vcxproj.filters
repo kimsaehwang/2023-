@@ -24,5 +24,118 @@
     <ClCompile Include="230428.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="230501.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230503.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230504.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230505.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230508.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230510.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230511.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230512.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230515.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230517.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="input.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="average.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230526.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230529.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230531.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230601.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230602.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230605.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="algorithm.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230607.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230608.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230609.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="cvector.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230612.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="230614.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Rectangle2D.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="vegnews.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Cirect2D.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="MyPoint.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="IntQueue.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="mytime0.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="cvector.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Rectangle2D.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Strngbad.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MyPoint.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Cirect2D.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
