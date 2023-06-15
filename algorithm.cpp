@@ -19,13 +19,35 @@ typedef struct
 	int max;
 	int ptr;
 	int* stk;
-}Intstack;*/
+}Intstack;
 using namespace std;
 void reverseDisplay(int value);
 void reverseDisplay(const string& str);
-
-int main(void)
+*/
+using namespace std;
+void hanoi(int discus, int a, int b);
+int main()
 {
+	//Q2.하노이탑 >>원반 최대 크기(0:exit) :1
+	
+	int discus;
+	cout << "원반 최대 크기(0:exit) : ";
+	cin >> discus;
+	hanoi(discus, 1, 3);
+	
+}
+void hanoi(int discus, int a, int b)
+{
+	if (discus > 1)
+	{
+		hanoi(discus - 1, a, 6 - a - b);
+	}
+	cout << "원반[" << discus << "]을 " << "[" << a << "]기둥에서 " << "[" << b << "]기둥으로 옮김"<<endl;
+	if (discus > 1)
+	{
+		hanoi(discus - 1, 6 - a - b, b);
+	}
+}
 	//재귀호출 리버스
 	/*reverseDisplay(12345);
 	reverseDisplay("abcd");
