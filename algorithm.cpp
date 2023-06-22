@@ -27,14 +27,49 @@ void reverseDisplay(const string& str);
 using namespace std;
 void hanoi(int discus, int a, int b);
 */
+using namespace std;
+void insertion(int list[], int n);
+void move(int no, int x, int y);
+
+
 int main()
 {
-	//버블정렬
-	int n, i, j;
-	for (i = 0;i < n - 1 < i++)
+	//p.226 단순 삽입 정렬
+
+	int a;
+	int list[] = { 6,4,8,5,2,9,7 };
+
+	for (int i = 0;i < 7;i++)
 	{
-		
+		cout << " "<< list[i] << " ";
 	}
+	cout << endl << endl;
+
+	insertion(list, 7);
+
+	for (int i = 0;i < 7;i++)
+	{
+		cout << " " << list[i] << " ";
+	}
+}
+
+void insertion(int list[], int n)
+{
+	int i, j, tmp;
+	for (i = 1;i < n;i++)
+	{
+		tmp = list[i];
+		for (j = i - 1;j >= 0 && list[j] > tmp;j--)
+		{
+			list[j + 1] = list[j];
+		}
+		list[j + 1] = tmp;
+	}
+}
+
+void move(int list[], int x, int y, int z)
+{
+
 }
 	//Q2.하노이탑 >>원반 최대 크기(0:exit) :1
 	/*int discus;
