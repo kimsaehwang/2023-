@@ -34,9 +34,10 @@ void move(int no, int x, int y);
 
 int main()
 {
-	//p.226 단순 삽입 정렬
 
-	int a;
+}
+	//p.226 단순 삽입 정렬
+	/*int a;
 	int list[] = { 6,4,8,5,2,9,7 };
 
 	for (int i = 0;i < 7;i++)
@@ -70,7 +71,8 @@ void insertion(int list[], int n)
 void move(int list[], int x, int y, int z)
 {
 
-}
+}*/
+
 	//Q2.하노이탑 >>원반 최대 크기(0:exit) :1
 	/*int discus;
 	cout << "원반 최대 크기(0:exit) : ";

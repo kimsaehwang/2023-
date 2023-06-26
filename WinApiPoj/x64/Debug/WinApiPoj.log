@@ -1,0 +1,6 @@
+﻿  WinApiPoj.cpp
+D:\work\2023\WinApiPoj\WinApiPoj.cpp(181,28): warning C4244: '=': 'WPARAM'에서 'TCHAR'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\work\2023\WinApiPoj\WinApiPoj.cpp(192,61): warning C4267: '인수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\work\2023\WinApiPoj\WinApiPoj.cpp(194,54): warning C4267: '인수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\work\2023\WinApiPoj\WinApiPoj.cpp(170,21): error C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\work\2023\WinApiPoj\WinApiPoj.cpp(177,13): error C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
