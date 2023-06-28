@@ -1,6 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
-//#include "IntQueue.h"
+#include "StopWatch.h"
 
 /*
 int int_cmp(const int* a, const int* b)
@@ -26,16 +26,62 @@ void reverseDisplay(const string& str);
 
 using namespace std;
 void hanoi(int discus, int a, int b);
-*/
-using namespace std;
+
 void insertion(int list[], int n);
 void move(int no, int x, int y);
+*/
 
+using namespace std;
 
 int main()
 {
+	int i;
+	int a[9] = { 5,7,1,4,6,2,3,9,8 };
 
+	cout << "정렬전 : ";
+	for (i = 0;i < 9;i++)
+	{
+		cout << a[i] << " ";
+	}
+	cout << endl;
+
+	quicksort(a, 0, 9 - 1);
+
+	cout << "정렬후 : ";
+	for(i = 0;i < 9;i++)
+	{
+		cout << a[i] << " ";
+	}
+	cout << endl;
+
+	StopWatch sw;
+	double elapTime = sw.getElapsedTime();
+	cout << "걸린 시간 : " << elapTime << "s";
 }
+
+void quicksort(int a[], int L, int R)
+{
+	int left = L;
+	int right = R;
+	int pivot = a[(L + R) / 2];
+	int temp;
+	do
+	{
+		while (a[L] < pivot) L++;
+		while (a[R] > pivot) R--;
+		if (L <= R)
+		{
+			temp = a[L];
+			a[L] = a[R];
+			a[R] = temp;
+			L++;
+			R--;
+		}
+	} while (L <= R);
+	if (left < R)quicksort(a, left, R);
+	if (L < right)quicksort(a, L, right);
+}
+
 	//p.226 단순 삽입 정렬
 	/*int a;
 	int list[] = { 6,4,8,5,2,9,7 };
