@@ -3,6 +3,8 @@
 
 #include "framework.h"
 #include "WinApiPoj.h"
+#include<cmath>
+#include<windowsx.h>
 
 #define MAX_LOADSTRING 100
 
@@ -16,6 +18,7 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -121,38 +124,103 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
 //
+
+#define BSIZE 40
+const int circleRadius = 50;
+
+//double LengthPts(int x1, int y1, int x2, int y2)
+{
+    return (sqrt((float)(x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)));
+}
+
+//BOOL InCircle(int x, int y, int mx, int my)
+{
+    if (LengthPts(x, y, mx, my) < BSIZE)return TRUE;
+    else return FALSE;
+}
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    /*PAINTSTRUCT ps;
+    HDC hdc;
+    static int x, y;
+    static bool Selection;
+    static RECT rt;
+    int mx, my;
     switch (message)
     {
     case WM_CREATE:
+        srand(unsigned(NULL));
+        x = 50;y = 50;
+        break;
+
+    case WM_LBUTTONDOWN:
+        mx = LOWORD(lParam);
+        my = HIWORD(lParam);
+        if (InCircle(x, y, mx, my))
+        {
+            x = rand() % rt.right;
+        }
+        InvalidateRect(hWnd, NULL, TRUE);
+        break;
+    case WM_LBUTTONUP:
+        Selection = FALSE;
+        InvalidateRect(hWnd, NULL, TRUE);
         break;
     case WM_PAINT:
-        PAINTSTRUCT ps;
-
-        HDC hdc = BeginPaint(hWnd, &ps);
-        POINT center = { 300,300 };
-        DrawGrid(hdc, center, 400, 400, 5);
-        EndPaint(hWnd, &ps);
+        hdc = GetDC(hWnd);
+        if (wParam & MK_CONTROL)
+        {
+            Ellipse(hdc, x - 25, y - 25, x + 25, y + 25);
+        }
+        else
+        {
+            Rectangle(hdc, x - 25, y - 25, x + 25, y + 25);
+        }
+        ReleaseDC(hWnd, hdc);
         break;
+    case WM_MOUSEMOVE:
+        mx = LOWORD(lParam);
+        my = LOWORD(lParam);
+        if (Selection)
+        {
+            x = mx;
+            y = my;
+            InvalidateRgn(hWnd, NULL, TRUE);
+        }
+        break;*/
+    static int posX, posY, oldX, oldY;
+    static bool bDraw = false;
+    PAINTSTRUCT ps;
+    HDC hdc;
+    switch(message)
+    {
+    case WM_LBUTTONDOWN:
+        posX = LOWORD(lParam);
+        posY = HIWORD(lParam);
+        oldX = posX;
+        oldY = posY;
+        bDraw = true;
+
+        break;
+    case WM_MOUSEMOVE:
+        if (bDraw)
+        {
+            hdc = GetDC(hWnd)
+
+        }
     case WM_DESTROY:
+
+        HideCaret(hWnd);
+        DestroyCaret();
         PostQuitMessage(0);
         break;
     }
     return(DefWindowProc(hWnd, message, wParam, lParam));
  }
-
-void DrawGrid(HDC hdc, POINT center, int Width, int Height, int count)
+void DrawCircle(HDC hdc, POINT pt, BOOL bFlag)
 {
-    center.x = Width * count / 2;
-    center.y = Height * count / 2;
-
-    for (int i = 0;i < count;i++)
-    {
-        MoveToEx(hdc, center.x - Width / count * i, center.y - Height / count * i, NULL);
-        LineTo(hdc, center.x + Width / count * i, center.y + Height / count * i);
-    }
-
+    if (bFlag)
+        SelectObject(hdc, GetStockObject(LTGRAY_BRUSH));
 }
 
 // 정보 대화 상자의 메시지 처리기입니다.
