@@ -35,7 +35,23 @@ using namespace std;
 
 int main()
 {
+	//merge sort
 	int i;
+	int a[13] = { 2,4,6,8,11,13,1,2,3,4,9,16,21 };
+	cout << "정렬전 : ";
+	for (i = 0;i < 13;i++)
+	{
+		cout << a[i] << " " ;
+	}
+	cout << endl;
+}
+
+void mergesort(int a[], int left, int right)
+{
+
+}
+	//Quick sort
+	/*int i;
 	int a[9] = { 5,7,1,4,6,2,3,9,8 };
 
 	cout << "정렬전 : ";
@@ -80,7 +96,7 @@ void quicksort(int a[], int L, int R)
 	} while (L <= R);
 	if (left < R)quicksort(a, left, R);
 	if (L < right)quicksort(a, L, right);
-}
+}*/
 
 	//p.226 단순 삽입 정렬
 	/*int a;
