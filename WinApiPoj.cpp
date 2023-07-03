@@ -3,8 +3,11 @@
 
 #include "framework.h"
 #include "WinApiPoj.h"
+#include "resource.h"
+#include <commdlg.h>
 #include<cmath>
 #include<ctime>
+#include<stdio.h>
 #include<windowsx.h>
 
 #define MAX_LOADSTRING 100
@@ -125,11 +128,33 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
 //
-#define PI 3.141592
+void OutFromFile(TCHAR filename[], HWND hWnd)
+{
+    FILE* fptr;
+    HDC hdc;
+    int line;
+    TCHAR buffer[500];
+    line = 0;
+    hdc = GetDC(hWnd);
+#ifdef _UNICODE
+    _tfopen_s(&fptr, filename, _T("r,ccs = UNICODE"));
+#else
+    _tfopen_s(&fptr, filename, _T("r"));
+#endif
+    while (_fgetts(buffer, 100, fptr) != NULL)
+    {
+        if (buffer[_tcslen(buffer) - 1] == _T('\n'))
+            buffer[_tcslen(buffer) - 1] = NULL;
+        TextOut(hdc, 0, line * 20, buffer, _tcslen(buffer));
+        line++;
+    }
+    fclose(fptr);
+    ReleaseDC(hWnd, hdc);
+}
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    switch (message)
+    /*switch (message)
     {
 
     case WM_LBUTTONDOWN:
@@ -166,22 +191,152 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         PostQuitMessage(0);
         break;
     }
-    return(DefWindowProc(hWnd, message, wParam, lParam));
+    return(DefWindowProc(hWnd, message, wParam, lParam));*/
+    HDC hdc;
+    PAINTSTRUCT ps;
+    static int x, y;
+    static BOOL selectedMenu;
+    enum {CIRCLE,RECTANGLE,STAR,NONE};
+    static POINT ptMousePos;
+    OPENFILENAME OFN;
+    TCHAR lpstrFile[100] = _T("");
+    TCHAR filter[] = _T("Every file(*.*) \0*.*\0Text file\0*.txt;*.doc\0");
+
+    int wmId = LOWORD(wParam);
+    switch (wmId)
+    {
+    case WM_CREATE:
+        break;
+
+    case WM_COMMAND:
+        switch (LOWORD(wParam))
+        {
+        case ID_FILEOPEN:
+            memset(&OFN, 0, sizeof(OPENFILENAME));
+            OFN.lStructSize = sizeof(OPENFILENAME);
+            OFN.hwndOwner = hWnd;
+            OFN.lpstrFilter = filter;
+            OFN.lpstrFile = lpstrFile;
+            OFN.nMaxFile = 256;
+            OFN.lpstrInitialDir = _T(".");
+            if (GetOpenFileName(&OFN) != 0)
+                OutFromFile(OFN.lpstrFile, hWnd);
+            break;
+        }
+        break;
+    case WM_LBUTTONDOWN:
+        ptMousePos.x = LOWORD(lParam);
+        ptMousePos.y = HIWORD(lParam);
+        InvalidateRgn(hWnd, NULL, TRUE);
+        break;
+    case WM_PAINT:
+        hdc = BeginPaint(hWnd, &ps);
+
+        switch (selectedMenu)
+        {
+        case CIRCLE:
+        {
+            static TCHAR str[100] = L"원";
+            TextOut(hdc, ptMousePos.x, ptMousePos.y, str, _tcslen(str));
+        }
+            break;
+        case RECTANGLE:
+        {
+            static TCHAR str[100] = L"사각형";
+            TextOut(hdc, ptMousePos.x, ptMousePos.y, str, _tcslen(str));
+        }
+            break;
+        case STAR:
+        {
+            static TCHAR str[100] = L"별";
+            TextOut(hdc, ptMousePos.x, ptMousePos.y, str, _tcslen(str));
+        }
+            break;
+        case NONE:
+        {
+            static TCHAR str[100] = L"아무일도 일어나지 않음";
+            TextOut(hdc, ptMousePos.x, ptMousePos.y, str, _tcslen(str));
+        }
+        default:
+            break;
+        }
+        EndPaint(hWnd, &ps);
+        break;
+    case ID_DRAW_CIRCLE:
+    {
+        int temp = selectedMenu;
+        int ans = MessageBox(hWnd, _T("원 그릴래?"), _T("도형 선택"), MB_YESNOCANCEL);
+        if (ans == IDYES)
+        {
+            selectedMenu = CIRCLE;
+        }
+        else if (ans == IDNO)
+        {
+            selectedMenu = NONE;
+        }
+        else
+        {
+            selectedMenu = temp;
+        }
+    }
+        break;
+    case ID_DRAW_RECTANGLE:
+        selectedMenu = RECTANGLE;
+        break;
+    case ID_DRAW_STAR:
+        selectedMenu = STAR;
+        break;
+
+    case ID_FILEOPEN:
+    {
+        TCHAR filter[] = _T("Every file(*.*) \0*.*\0Text file\0*.txt;*.doc\0");
+        TCHAR lpstrFile[100] = _T("");
+
+        OPENFILENAME ofn;
+        memset(&ofn, 0, sizeof(OPENFILENAME));
+        ofn.lStructSize = sizeof(OPENFILENAME);
+        ofn.hwndOwner = hWnd;
+        ofn.lpstrFilter = filter;
+        ofn.lpstrFile = lpstrFile;
+        ofn.nMaxFile = 100;
+        ofn.lpstrInitialDir = _T(".");
+        if (GetOpenFileName(&ofn) != 0)
+        {
+            TCHAR str[100];
+            _stprintf_s(str, _T("%s 파일을 열겠습니까?"), ofn.lpstrFile);
+            MessageBox(hWnd, str, _T("파일 선택"), MB_OK);
+        }
+    }
+    break;
+    case IDM_ABOUT:
+        DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+    case IDM_EXIT:
+        DestroyWindow(hWnd);
+        break;
+    }
+
+    return (DefWindowProc(hWnd, message, wParam, lParam));
 }
 
-void star(HDC hdc, POINT& center, double radius, int n)
+void DrawCircle(HDC hdc, POINT pt, BOOL bFlag)
 {
-    POINT points[10];
-    double angle = 2.0 * PI / n;
-    for (int j = 0; j < n * 2; j++)
-    {
-        double currentAngle = j * angle;
-        int px = center.x + static_cast<int>(radius * sin(currentAngle));
-        int py = center.y + static_cast<int>(radius * cos(currentAngle));
-        points[j % n] = { px, py };
-    }
-    Polygon(hdc, points, n);
+    if (bFlag)
+        SelectObject(hdc, GetStockObject(LTGRAY_BRUSH));
 }
+
+//void star(HDC hdc, POINT& center, double radius, int n)
+//{
+//    POINT points[10];
+//    double angle = 2.0 * PI / n;
+//    for (int j = 0; j < n * 2; j++)
+//    {
+//        double currentAngle = j * angle;
+//        int px = center.x + static_cast<int>(radius * sin(currentAngle));
+//        int py = center.y + static_cast<int>(radius * cos(currentAngle));
+//        points[j % n] = { px, py };
+//    }
+//    Polygon(hdc, points, n);
+//}
 
 // 정보 대화 상자의 메시지 처리기입니다.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)

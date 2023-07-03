@@ -35,8 +35,27 @@ using namespace std;
 
 int main()
 {
-	//merge sort
+	int num = 7;
 	int i;
+	int heap[7] = { 6,4,3,7,1,9,8 };
+	
+	cout << "정렬전 : ";
+	for (i = 0;i < num;i++)
+	{
+		cout << heap[i] << " ";
+	}
+	cout << endl;
+
+}
+
+void heapsort(int heap[], int n)
+{
+	int i;
+	for(i=0;i<=n;i++)
+
+}
+	//merge sort
+	/*int i;
 	int a[13] = { 2,4,6,8,11,13,1,2,3,4,9,16,21 };
 	cout << "정렬전 : ";
 	for (i = 0;i < 13;i++)
@@ -49,7 +68,8 @@ int main()
 void mergesort(int a[], int left, int right)
 {
 
-}
+}*/
+
 	//Quick sort
 	/*int i;
 	int a[9] = { 5,7,1,4,6,2,3,9,8 };
