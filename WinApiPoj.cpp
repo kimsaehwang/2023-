@@ -10,6 +10,21 @@
 #include<stdio.h>
 #include<windowsx.h>
 
+// >>:
+#pragma comment(lib,"msimg32.lib")
+
+HBITMAP hBackImage;
+BITMAP bitBack;
+
+HBITMAP hTransparentImage;
+BITMAP bitTransparent;
+
+void CreateBitmap();
+void DrawBitmap(HWND hWnd, HDC hdc);
+void DestroyBitmap();
+
+// <<:
+
 #define MAX_LOADSTRING 100
 
 // 전역 변수:
@@ -64,6 +79,75 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
 
+void CreateBitmap()
+{
+    {
+        hBackImage = (HBITMAP)LoadImage(NULL, TEXT("image/수지.bmp"),
+            IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+
+        if (hBackImage == NULL)
+        {
+            DWORD dwError = GetLastError();
+            MessageBox(NULL, _T("이미지 로드 에러"), _T("에러"), MB_OK);
+            return;
+        }
+        GetObject(hBackImage, sizeof(BITMAP), &bitBack);
+    }
+
+    {
+        hTransparentImage = (HBITMAP)LoadImage(NULL, TEXT("image/sigong.bmp"),
+            IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+
+        if (hTransparentImage == NULL)
+        {
+            DWORD dwError = GetLastError();
+            MessageBox(NULL, _T("이미지 로드 에러 2"), _T("에러"), MB_OK);
+            return;
+        }
+        GetObject(hTransparentImage, sizeof(BITMAP), &bitTransparent);
+    }
+
+}
+
+void DrawBitmap(HWND hWnd, HDC hdc)
+{
+    HDC hMemDC;
+    HBITMAP hOldBitmap;
+    int bx, by;
+
+    { //수지
+        hMemDC = CreateCompatibleDC(hdc);
+        hOldBitmap = (HBITMAP)SelectObject(hMemDC, hBackImage);
+        bx = bitBack.bmWidth;
+        by = bitBack.bmHeight;
+
+        BitBlt(hdc, 0, 0, bx, by, hMemDC, 0, 0, SRCCOPY);
+
+        //SelectObject(hMemDC, hOldBitmap);
+        DeleteDC(hMemDC);
+    }
+
+    {//시공
+        hMemDC = CreateCompatibleDC(hdc);
+        hOldBitmap = (HBITMAP)SelectObject(hMemDC, hTransparentImage);
+        bx = bitTransparent.bmWidth;
+        by = bitTransparent.bmHeight;
+
+        //BitBlt(hdc, 150, 150, bx, by, hMemDC, 0, 0, SRCCOPY);
+        TransparentBlt(hdc, 150, 150, bx * 2, by * 2, hMemDC, 0, 0, bx, by, RGB(255, 0, 255));
+
+        TransparentBlt(hdc, 250, 150, bx / 2, by / 2, hMemDC, 0, 0, bx, by, RGB(255, 0, 255));
+
+        //SelectObject(hMemDC, hOldBitmap);
+        DeleteDC(hMemDC);
+    }
+
+}
+void DestroyBitmap()
+{
+    DeleteObject(hBackImage);
+    DeleteObject(hTransparentImage);
+}
 //
 //  함수: MyRegisterClass()
 //
@@ -128,7 +212,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
 //
-void OutFromFile(TCHAR filename[], HWND hWnd)
+/*void OutFromFile(TCHAR filename[], HWND hWnd)
 {
     FILE* fptr;
     HDC hdc;
@@ -150,10 +234,32 @@ void OutFromFile(TCHAR filename[], HWND hWnd)
     }
     fclose(fptr);
     ReleaseDC(hWnd, hdc);
-}
+}*/
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    HDC hdc, memdc;
+    PAINTSTRUCT ps;
+    switch (message)
+    {
+    case WM_CREATE:
+    {
+        CreateBitmap();
+    }
+    break;
+
+    case WM_PAINT:
+        hdc = BeginPaint(hWnd, &ps);
+        DestroyBitmap();
+        EndPaint(hWnd, &ps);
+        break;
+
+    case WM_DESTROY:
+        DestroyBitmap();
+        break;
+    }
+    return (DefWindowProc(hWnd, message, wParam, lParam));
+}
     /*switch (message)
     {
 
@@ -185,30 +291,76 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         ReleaseDC(hWnd, hdc);
         break;
     }
-        
+
 
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
     }
     return(DefWindowProc(hWnd, message, wParam, lParam));*/
+    /*
     HDC hdc;
     PAINTSTRUCT ps;
-    static int x, y;
+    static int x, y, circleRadius;
     static BOOL selectedMenu;
+    static BOOL bFlag;
+    static BOOL COPY;
     enum {CIRCLE,RECTANGLE,STAR,NONE};
     static POINT ptMousePos;
+    static POINT ptCurPos;
+    static RECT rectView;
+    static HMENU hMenu, hSubMenu;
     OPENFILENAME OFN;
     TCHAR lpstrFile[100] = _T("");
     TCHAR filter[] = _T("Every file(*.*) \0*.*\0Text file\0*.txt;*.doc\0");
 
-    int wmId = LOWORD(wParam);
-    switch (wmId)
+    switch (message)
     {
     case WM_CREATE:
+
+        hMenu = GetMenu(hWnd);
+        hSubMenu = GetSubMenu(hMenu, 2);
+        COPY = FALSE;
+        EnableMenuItem(hSubMenu, ID_EDIT_PASTE, MF_GRAYED);
+        EnableMenuItem(hSubMenu, ID_EDIT_COPY, MF_GRAYED);
         break;
 
     case WM_COMMAND:
+       {
+        int wmId = LOWORD(wParam);
+        *switch (wmId)
+            * {
+        *case ID_DRAW_CIRCLE:
+            * {
+                int temp = selectedMenu;
+                int ans = MessageBox(hWnd, _T("원 그릴래?"), _T("도형 선택"), MB_YESNOCANCEL);
+                if (ans == IDYES)
+                {
+                    selectedMenu = CIRCLE;
+                }
+                else if (ans == IDNO)
+                {
+                    selectedMenu = NONE;
+                }
+                else
+                {
+                    selectedMenu = temp;
+                }
+            }
+            selectedMenu = CIRCLE;
+        }
+        break;
+    case ID_DRAW_RECTANGLE:
+        selectedMenu = RECTANGLE;
+        break;
+    case ID_DRAW_STAR:
+        selectedMenu = STAR;
+        break;
+        if (LOWORD(wParam) == ID_EDIT_COPY)
+        {
+            COPY = TRUE;
+            InvalidateRgn(hWnd, NULL, TRUE);
+        }
         switch (LOWORD(wParam))
         {
         case ID_FILEOPEN:
@@ -223,12 +375,43 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 OutFromFile(OFN.lpstrFile, hWnd);
             break;
         }
+    }
         break;
     case WM_LBUTTONDOWN:
         ptMousePos.x = LOWORD(lParam);
         ptMousePos.y = HIWORD(lParam);
+        ptCurPos.x += circleRadius;
+        if (ptCurPos.x + circleRadius > rectView.right)
+            ptCurPos.x = rectView.right - circleRadius;
+
+        if (wParam == VK_RIGHT || wParam == VK_LEFT || wParam == VK_UP || wParam == VK_DOWN)
+        {
+            bFlag = TRUE;
+        }
+
+        if (wParam == 'C' || wParam == 'c')
+        {
+            UINT state = GetMenuState(hSubMenu, ID_EDIT_COPY, MF_BYCOMMAND);
+            if ((state == MF_DISABLED) || (state == MF_GRAYED))
+            {
+                EnableMenuItem(hSubMenu, ID_EDIT_COPY, MF_ENABLED);
+            }
+            else if (state == MF_ENABLED)
+            {
+                EnableMenuItem(hSubMenu, ID_EDIT_COPY, MF_GRAYED);
+            }
+        }
         InvalidateRgn(hWnd, NULL, TRUE);
         break;
+
+    case WM_KEYUP:
+    {
+        int breakpoint = 999;
+        bFlag = FALSE;
+        InvalidateRgn(hWnd, NULL, TRUE);
+    }
+    break;
+
     case WM_PAINT:
         hdc = BeginPaint(hWnd, &ps);
 
@@ -239,19 +422,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             static TCHAR str[100] = L"원";
             TextOut(hdc, ptMousePos.x, ptMousePos.y, str, _tcslen(str));
         }
-            break;
+        break;
         case RECTANGLE:
         {
             static TCHAR str[100] = L"사각형";
             TextOut(hdc, ptMousePos.x, ptMousePos.y, str, _tcslen(str));
         }
-            break;
+        break;
         case STAR:
         {
             static TCHAR str[100] = L"별";
             TextOut(hdc, ptMousePos.x, ptMousePos.y, str, _tcslen(str));
         }
-            break;
+        break;
         case NONE:
         {
             static TCHAR str[100] = L"아무일도 일어나지 않음";
@@ -262,30 +445,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         EndPaint(hWnd, &ps);
         break;
-    case ID_DRAW_CIRCLE:
-    {
-        int temp = selectedMenu;
-        int ans = MessageBox(hWnd, _T("원 그릴래?"), _T("도형 선택"), MB_YESNOCANCEL);
-        if (ans == IDYES)
-        {
-            selectedMenu = CIRCLE;
-        }
-        else if (ans == IDNO)
-        {
-            selectedMenu = NONE;
-        }
-        else
-        {
-            selectedMenu = temp;
-        }
-    }
-        break;
-    case ID_DRAW_RECTANGLE:
-        selectedMenu = RECTANGLE;
-        break;
-    case ID_DRAW_STAR:
-        selectedMenu = STAR;
-        break;
+
 
     case ID_FILEOPEN:
     {
@@ -322,9 +482,9 @@ void DrawCircle(HDC hdc, POINT pt, BOOL bFlag)
 {
     if (bFlag)
         SelectObject(hdc, GetStockObject(LTGRAY_BRUSH));
-}
+}*/
 
-//void star(HDC hdc, POINT& center, double radius, int n)
+    //void star(HDC hdc, POINT& center, double radius, int n)
 //{
 //    POINT points[10];
 //    double angle = 2.0 * PI / n;

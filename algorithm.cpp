@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include "StopWatch.h"
+#include <vector>
 
 /*
 int int_cmp(const int* a, const int* b)
@@ -33,9 +34,40 @@ void move(int no, int x, int y);
 
 using namespace std;
 
-int main()
-{
-	int num = 7;
+
+int countFriends(int arr[][2], int size, int n) {
+	int count = 0;
+
+	for (int i = 0; i < size; i++) {
+		if (arr[i][0] == n || arr[i][1] == n) {
+			count++;
+		}
+	}
+
+	return count;
+}
+
+int main() {
+	int arr[][2] = {
+		{1, 3},
+		{2, 4},
+		{3, 2},
+		{4, 3},
+		{5, 2}
+	};
+	int size = sizeof(arr) / sizeof(arr[0]);
+
+	for (int n = 1; n <= 5; n++) {
+		int friendCount = countFriends(arr, size, n);
+		std::cout << n << "Ήψ: " << friendCount << "Έν" << std::endl;
+	}
+
+	return 0;
+}
+
+
+	//heapsort
+	/*int num = 7;
 	int i;
 	int heap[7] = { 6,4,3,7,1,9,8 };
 	
@@ -53,7 +85,8 @@ void heapsort(int heap[], int n)
 	int i;
 	for(i=0;i<=n;i++)
 
-}
+}*/
+
 	//merge sort
 	/*int i;
 	int a[13] = { 2,4,6,8,11,13,1,2,3,4,9,16,21 };
