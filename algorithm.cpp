@@ -34,21 +34,60 @@ void move(int no, int x, int y);
 
 using namespace std;
 
+int main()
+{
+	int arr[7] = { 5, 2, 4, 8, 9, 1, 4 };
 
-int countFriends(int arr[][2], int size, int n) {
-	int count = 0;
+	cout << "정렬 전: ";
+	for (int i = 0; i < 7; i++)
+	{
+		cout << arr[i] << " ";
+	}
+	cout << endl;
 
-	for (int i = 0; i < size; i++) {
-		if (arr[i][0] == n || arr[i][1] == n) {
-			count++;
+	countingSort(arr, 7);
+
+	cout << "정렬 후: ";
+	for (int i = 0; i < 7; i++)
+	{
+		cout << arr[i] << " ";
+	}
+	cout << endl;
+
+	return 0;
+}
+
+void countingSort(int arr[], int n)
+{
+	int i;
+	int max = arr[0];
+	int* count = new int[max + 1]();
+	int index = 0;
+	for (i = 1; i < n; i++)
+	{
+		if (arr[i] > max)
+		{
+			max = arr[i];
 		}
 	}
 
-	return count;
+	for (i = 0; i < n; i++)
+	{
+		count[arr[i]]++;
+	}
+
+	for (i = 0; i <= max; i++)
+	{
+		while (count[i] > 0)
+		{
+			arr[index++] = i;
+			count[i]--;
+		}
+	}
 }
 
-int main() {
-	int arr[][2] = {
+	//친구수 분석
+	/*int arr[][2] = {
 		{1, 3},
 		{2, 4},
 		{3, 2},
@@ -64,7 +103,20 @@ int main() {
 
 	return 0;
 }
+int countFriends(int arr[][2], int size, int n) 
+{
+	int count = 0;
 
+	for (int i = 0; i < size; i++) 
+	{
+		if (arr[i][0] == n || arr[i][1] == n) 
+		{
+			count++;
+		}
+	}
+
+	return count;
+}*/
 
 	//heapsort
 	/*int num = 7;

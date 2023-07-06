@@ -16,14 +16,44 @@
 HBITMAP hBackImage;
 BITMAP bitBack;
 
+HBITMAP hFrontImage;
+BITMAP bitFront;
+
 HBITMAP hTransparentImage;
 BITMAP bitTransparent;
+
+// >> : ANI
+HBITMAP hAniImage;
+BITMAP bitAni;
+const int SPRITE_SIZE_X = 57;
+const int SPRITE_SIZE_Y = 52;
+
+int RUN_FRAME_MAX = 0;
+int RUN_FRAME_MIN = 0;
+int curframe = RUN_FRAME_MIN;
+
+int SPRITE_FRAME_COUNT_X = 0;
+int SPRITE_FRAME_COUNT_Y = 0;
+// << : ANI
+
+// >> :함수
+RECT rectView;
 
 void CreateBitmap();
 void DrawBitmap(HWND hWnd, HDC hdc);
 void DestroyBitmap();
+void UpdateFrame(HWND hWnd);
+void DrawRectText(HDC hdc);
+VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
+void Update();
+void Render();
+// <<:함수
 
-// <<:
+// >>:더블버퍼링
+HBITMAP hDoubleBufferImage;
+void DrawBitmapDoubleBuffering(HWND hwnd, HDC hdc);
+
+// <<:더블버퍼링
 
 #define MAX_LOADSTRING 100
 
@@ -65,6 +95,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     MSG msg;
 
     // 기본 메시지 루프입니다:
+    /*
     while (GetMessage(&msg, nullptr, 0, 0))
     {
         if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
@@ -73,10 +104,29 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             DispatchMessage(&msg);
         }
     }
-
+    */
+    while (true)
+    {
+        if(PeekMessage(&msg,NULL,0,0,PM_REMOVE))
+        {
+            if (msg.message == WM_QUIT)
+            {
+                break;
+            }
+            else
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+        else
+        {
+            //Update();
+            //Render();
+        }
+    }
     return (int) msg.wParam;
 }
-
 
 
 void CreateBitmap()
@@ -107,6 +157,34 @@ void CreateBitmap()
         GetObject(hTransparentImage, sizeof(BITMAP), &bitTransparent);
     }
 
+    {
+        hAniImage = (HBITMAP)LoadImage(NULL, TEXT("image/zero_run.bmp"),
+            IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+
+        if (hAniImage == NULL)
+        {
+            DWORD dwError = GetLastError();
+            MessageBox(NULL, _T("이미지 로드 에러 3"), _T("에러"), MB_OK);
+            return;
+        }
+        GetObject(hAniImage, sizeof(BITMAP), &bitAni);
+
+        SPRITE_FRAME_COUNT_X = bitAni.bmWidth / SPRITE_SIZE_X;
+        SPRITE_FRAME_COUNT_Y = bitAni.bmHeight / SPRITE_SIZE_Y;
+    }
+
+    {
+        hFrontImage = (HBITMAP)LoadImage(NULL, TEXT("image/Background.bmp"),
+            IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+
+        if (hFrontImage == NULL)
+        {
+            DWORD dwError = GetLastError();
+            MessageBox(NULL, _T("이미지 로드 에러4"), _T("에러"), MB_OK);
+            return;
+        }
+        GetObject(hFrontImage, sizeof(BITMAP), &bitFront);
+    }
 }
 
 void DrawBitmap(HWND hWnd, HDC hdc)
@@ -129,25 +207,184 @@ void DrawBitmap(HWND hWnd, HDC hdc)
 
     {//시공
         hMemDC = CreateCompatibleDC(hdc);
-        hOldBitmap = (HBITMAP)SelectObject(hMemDC, hTransparentImage);
+       hOldBitmap = (HBITMAP)SelectObject(hMemDC, hTransparentImage);
         bx = bitTransparent.bmWidth;
         by = bitTransparent.bmHeight;
+
 
         //BitBlt(hdc, 150, 150, bx, by, hMemDC, 0, 0, SRCCOPY);
         TransparentBlt(hdc, 150, 150, bx * 2, by * 2, hMemDC, 0, 0, bx, by, RGB(255, 0, 255));
 
-        TransparentBlt(hdc, 250, 150, bx / 2, by / 2, hMemDC, 0, 0, bx, by, RGB(255, 0, 255));
+        TransparentBlt(hdc, 150, 300, bx / 2, by / 2, hMemDC, 0, 0, bx, by, RGB(255, 0, 255));
 
         //SelectObject(hMemDC, hOldBitmap);
         DeleteDC(hMemDC);
     }
 
+    {//ANI
+        hMemDC = CreateCompatibleDC(hdc);
+        hOldBitmap = (HBITMAP)SelectObject(hMemDC, hAniImage);
+        bx = bitAni.bmWidth / SPRITE_FRAME_COUNT_X;
+        by = bitAni.bmHeight / SPRITE_FRAME_COUNT_Y;
+
+       //BitBlt(hdc, 150, 150, bx, by, hMemDC, 0, 0, SRCCOPY);
+        int xStart = curframe * bx;
+        int yStart = 0;
+        TransparentBlt(hdc, 250, 150, bx * 2, by * 2, hMemDC, xStart, yStart, bx, by, RGB(255, 0, 255));
+        TransparentBlt(hdc, 250, 150, bx / 2, by / 2, hMemDC, xStart, yStart, bx, by, RGB(255, 0, 255));
+        //SelectObject(hMemDC, hOldBitmap);
+        DeleteDC(hMemDC);
+    }
 }
 void DestroyBitmap()
 {
+    DeleteObject(hAniImage);
     DeleteObject(hBackImage);
     DeleteObject(hTransparentImage);
 }
+void UpdateFrame(HWND hWnd)
+{
+    curframe++;
+    if (curframe > RUN_FRAME_MAX)
+        curframe = RUN_FRAME_MIN;
+    InvalidateRgn(hWnd, NULL, false);
+}
+
+static int yPos = 0;
+void DrawRectText(HDC hdc)
+{
+   
+    TCHAR strTest[] = _T("이미지 출력");
+    TextOut(hdc, 10, yPos, strTest, _tcslen(strTest));
+}
+
+VOID CALLBACK AniProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
+{
+    UpdateFrame(hWnd);
+
+    yPos += 5;
+    if (yPos > rectView.bottom)yPos = 0;
+}
+
+void Update()
+{
+    // : WM_KEYDOWN , WM_KEYUP
+    if (GetKeyState('A') & 0x8000)
+    {
+    }
+
+    if (GetKeyState('D') & 0x8000)
+    {
+    }
+
+    if (GetKeyState('W') & 0x8000)
+    {
+    }
+
+    if (GetKeyState('s') & 0x8000)
+    {
+    }
+}
+
+void Render()
+{
+}
+
+void DrawBitmapDoubleBuffering(HWND hwnd, HDC hdc)
+{
+    HDC hMemDC;
+    HBITMAP hOldBitmap;
+    int bx, by;
+
+    HDC hMemDC2;
+    HBITMAP hOldBitmap2;
+
+    hMemDC = CreateCompatibleDC(hdc);
+    if (hDoubleBufferImage == NULL)
+    {
+        hDoubleBufferImage = CreateCompatibleBitmap(hdc, rectView.right, rectView.bottom);
+    }
+    hOldBitmap = (HBITMAP)SelectObject(hMemDC, hDoubleBufferImage);
+
+    { //수지
+        hMemDC2 = CreateCompatibleDC(hMemDC);
+        hOldBitmap2 = (HBITMAP)SelectObject(hMemDC2, hBackImage);
+        bx = bitBack.bmWidth;
+        by = bitBack.bmHeight;
+
+        BitBlt(hMemDC, 0, 0, bx, by, hMemDC2, 0, 0, SRCCOPY);
+
+        SelectObject(hMemDC2, hOldBitmap2);
+        DeleteDC(hMemDC2);
+    }
+
+    {//시공
+        hMemDC2 = CreateCompatibleDC(hMemDC);
+        hOldBitmap2 = (HBITMAP)SelectObject(hMemDC2, hTransparentImage);
+        bx = bitTransparent.bmWidth;
+        by = bitTransparent.bmHeight;
+
+
+        //BitBlt(hdc, 150, 150, bx, by, hMemDC, 0, 0, SRCCOPY);
+        TransparentBlt(hMemDC, 150, 150, bx * 2, by * 2, hMemDC2, 0, 0, bx, by, RGB(255, 0, 255));
+
+        TransparentBlt(hMemDC, 150, 300, bx / 2, by / 2, hMemDC2, 0, 0, bx, by, RGB(255, 0, 255));
+
+        SelectObject(hMemDC2, hOldBitmap2);
+        DeleteDC(hMemDC2);
+    }
+
+    {//ani
+        hMemDC2 = CreateCompatibleDC(hMemDC);
+        hOldBitmap2 = (HBITMAP)SelectObject(hMemDC2, hAniImage);
+        bx = bitAni.bmWidth / SPRITE_FRAME_COUNT_X;
+        by = bitAni.bmHeight / SPRITE_FRAME_COUNT_Y;
+
+        int xStart = curframe * bx;
+        int yStart = 0;
+        
+        static int xPos = 0;
+        TransparentBlt(hMemDC, xPos + 150, 300, bx, by, hMemDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
+        DeleteDC(hMemDC2);
+
+        xPos++;
+        SelectObject(hMemDC2, hOldBitmap2);
+        DeleteDC(hMemDC2);
+    }
+    // <<: hMemDC 에 그려주기
+
+    { //Background
+        hMemDC2 = CreateCompatibleDC(hMemDC);
+        hOldBitmap2 = (HBITMAP)SelectObject(hMemDC2, hFrontImage);
+        bx = bitFront.bmWidth;
+        by = bitFront.bmHeight;
+
+        HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 255));
+        HBRUSH oldBrush = (HBRUSH)SelectObject(hMemDC2, hBrush);
+
+        Ellipse(hMemDC2, 250, 100, 750, 500);
+
+        SelectObject(hMemDC2, oldBrush);
+        DeleteObject(hBrush);
+
+        TransparentBlt(hMemDC, 0, 0, bx, by, hMemDC2, 0, 0, bx, by, RGB(255, 0, 255));
+        SelectObject(hMemDC2, hOldBitmap2);
+
+        DeleteDC(hMemDC2);
+    }
+
+    // >> : hdc에 그려주기
+    //BitBlt(hdc, 0, 0, rectView.right, rectView.bottom, hMemDC, 0, 0, SRCCOPY);
+    TransparentBlt(hdc, 0, 0, rectView.right, rectView.bottom, 
+                    hMemDC, 0, 0, rectView.right, rectView.bottom,
+                    RGB(255, 0, 255));
+
+
+
+    SelectObject(hMemDC, hOldBitmap);
+    DeleteDC(hMemDC);
+}
+
 //
 //  함수: MyRegisterClass()
 //
@@ -236,25 +473,51 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     ReleaseDC(hWnd, hdc);
 }*/
 
+#define timer_ID_2 123
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     HDC hdc, memdc;
     PAINTSTRUCT ps;
+    static BOOL bFlag;
     switch (message)
     {
+    case WM_SIZE://윈도우 크기 변경할때마다 가져옴
+        GetClientRect(hWnd, &rectView);
+        break;
+
     case WM_CREATE:
     {
         CreateBitmap();
+        GetClientRect(hWnd, &rectView);
+        SetTimer(hWnd, timer_ID_2, 30, AniProc);//애니 타이머 콜백가능함
     }
     break;
 
+    case WM_TIMER:
+    if (wParam == timer_ID_2)
+    {
+        UpdateFrame(hWnd);
+        InvalidateRgn(hWnd, NULL, TRUE);
+    }
+
     case WM_PAINT:
         hdc = BeginPaint(hWnd, &ps);
-        DestroyBitmap();
+        //DrawBitmap(hWnd, hdc);
+        DrawBitmapDoubleBuffering(hWnd, hdc);
+        DrawRectText(hdc);
         EndPaint(hWnd, &ps);
         break;
+    
+    case WM_KEYUP:
+    {
+        int breakpoint = 999;
+        bFlag = FALSE;
+        InvalidateRgn(hWnd, NULL, TRUE);
+    }
+    break;
 
     case WM_DESTROY:
+        KillTimer(hWnd, timer_ID_2);
         DestroyBitmap();
         break;
     }
@@ -497,6 +760,8 @@ void DrawCircle(HDC hdc, POINT pt, BOOL bFlag)
 //    }
 //    Polygon(hdc, points, n);
 //}
+
+
 
 // 정보 대화 상자의 메시지 처리기입니다.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
