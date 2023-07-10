@@ -36,7 +36,10 @@ using namespace std;
 
 int main()
 {
-	int arr[7] = { 5, 2, 4, 8, 9, 1, 4 };
+
+}
+	//도수 정렬
+	/*int arr[7] = { 5, 2, 4, 8, 9, 1, 4 };
 
 	cout << "정렬 전: ";
 	for (int i = 0; i < 7; i++)
@@ -84,7 +87,7 @@ void countingSort(int arr[], int n)
 			count[i]--;
 		}
 	}
-}
+}*/
 
 	//친구수 분석
 	/*int arr[][2] = {
