@@ -1,12 +1,15 @@
-﻿#include "framework.h"
-#include "WindowsProject1.h"
+﻿// WinApiPoj.cpp : 애플리케이션에 대한 진입점을 정의합니다.
+//
+
+#include "framework.h"
+#include "WinApiPoj.h"
 #include "resource.h"
 #include <commdlg.h>
 #include<cmath>
 #include<ctime>
 #include<stdio.h>
 #include<windowsx.h>
-
+BOOL CALLBACK Dlg6_1Proc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
 // >>:
 #pragma comment(lib,"msimg32.lib")
 
@@ -52,6 +55,8 @@ void DrawBitmapDoubleBuffering(HWND hwnd, HDC hdc);
 
 // <<:더블버퍼링
 
+void Gdi_END();
+
 #define MAX_LOADSTRING 100
 
 // 전역 변수:
@@ -67,9 +72,9 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-    _In_opt_ HINSTANCE hPrevInstance,
-    _In_ LPWSTR    lpCmdLine,
-    _In_ int       nCmdShow)
+                     _In_opt_ HINSTANCE hPrevInstance,
+                     _In_ LPWSTR    lpCmdLine,
+                     _In_ int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -78,16 +83,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_WINDOWSPROJECT1, szWindowClass, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDC_WINAPIPOJ, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
     // 애플리케이션 초기화를 수행합니다:
-    if (!InitInstance(hInstance, nCmdShow))
+    if (!InitInstance (hInstance, nCmdShow))
     {
         return FALSE;
     }
 
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_WINDOWSPROJECT1));
+    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_WINAPIPOJ));
 
     MSG msg;
 
@@ -104,7 +109,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     */
     while (true)
     {
-        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        if(PeekMessage(&msg,NULL,0,0,PM_REMOVE))
         {
             if (msg.message == WM_QUIT)
             {
@@ -122,7 +127,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             //Render();
         }
     }
-    return (int)msg.wParam;
+    return (int) msg.wParam;
 }
 
 
@@ -204,7 +209,7 @@ void DrawBitmap(HWND hWnd, HDC hdc)
 
     {//시공
         hMemDC = CreateCompatibleDC(hdc);
-        hOldBitmap = (HBITMAP)SelectObject(hMemDC, hTransparentImage);
+       hOldBitmap = (HBITMAP)SelectObject(hMemDC, hTransparentImage);
         bx = bitTransparent.bmWidth;
         by = bitTransparent.bmHeight;
 
@@ -224,7 +229,7 @@ void DrawBitmap(HWND hWnd, HDC hdc)
         bx = bitAni.bmWidth / SPRITE_FRAME_COUNT_X;
         by = bitAni.bmHeight / SPRITE_FRAME_COUNT_Y;
 
-        //BitBlt(hdc, 150, 150, bx, by, hMemDC, 0, 0, SRCCOPY);
+       //BitBlt(hdc, 150, 150, bx, by, hMemDC, 0, 0, SRCCOPY);
         int xStart = curframe * bx;
         int yStart = 0;
         TransparentBlt(hdc, 250, 150, bx * 2, by * 2, hMemDC, xStart, yStart, bx, by, RGB(255, 0, 255));
@@ -232,7 +237,14 @@ void DrawBitmap(HWND hWnd, HDC hdc)
         //SelectObject(hMemDC, hOldBitmap);
         DeleteDC(hMemDC);
     }
+
 }
+
+void Gdi_END()
+{
+    
+}
+
 void DestroyBitmap()
 {
     DeleteObject(hAniImage);
@@ -250,7 +262,7 @@ void UpdateFrame(HWND hWnd)
 static int yPos = 0;
 void DrawRectText(HDC hdc)
 {
-
+   
     TCHAR strTest[] = _T("이미지 출력");
     TextOut(hdc, 10, yPos, strTest, _tcslen(strTest));
 }
@@ -339,7 +351,7 @@ void DrawBitmapDoubleBuffering(HWND hwnd, HDC hdc)
 
         int xStart = curframe * bx;
         int yStart = 0;
-
+        
         static int xPos = 0;
         TransparentBlt(hMemDC, xPos + 150, 300, bx, by, hMemDC2, xStart, yStart, bx, by, RGB(255, 0, 255));
         DeleteDC(hMemDC2);
@@ -372,9 +384,9 @@ void DrawBitmapDoubleBuffering(HWND hwnd, HDC hdc)
 
     // >> : hdc에 그려주기
     //BitBlt(hdc, 0, 0, rectView.right, rectView.bottom, hMemDC, 0, 0, SRCCOPY);
-    TransparentBlt(hdc, 0, 0, rectView.right, rectView.bottom,
-        hMemDC, 0, 0, rectView.right, rectView.bottom,
-        RGB(255, 0, 255));
+    TransparentBlt(hdc, 0, 0, rectView.right, rectView.bottom, 
+                    hMemDC, 0, 0, rectView.right, rectView.bottom,
+                    RGB(255, 0, 255));
 
 
 
@@ -393,17 +405,17 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc = WndProc;
-    wcex.cbClsExtra = 0;
-    wcex.cbWndExtra = 0;
-    wcex.hInstance = hInstance;
-    wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WINDOWSPROJECT1));
-    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW - 2);
-    wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_WINDOWSPROJECT1);
-    wcex.lpszClassName = szWindowClass;
-    wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+    wcex.style          = CS_HREDRAW | CS_VREDRAW;
+    wcex.lpfnWndProc    = WndProc;
+    wcex.cbClsExtra     = 0;
+    wcex.cbWndExtra     = 0;
+    wcex.hInstance      = hInstance;
+    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WINAPIPOJ));
+    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
+    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW-2);
+    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_WINAPIPOJ);
+    wcex.lpszClassName  = szWindowClass;
+    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
     return RegisterClassExW(&wcex);
 }
@@ -420,20 +432,20 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
+   hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
-    HWND hWnd = CreateWindowW(szWindowClass, _T("szTitle"), WS_OVERLAPPEDWINDOW,
-        200, 200, 1024, 768, nullptr, nullptr, hInstance, nullptr);
+   HWND hWnd = CreateWindowW(szWindowClass, _T("szTitle"), WS_OVERLAPPEDWINDOW,
+       200, 200, 1024, 768, nullptr, nullptr, hInstance, nullptr);
 
-    if (!hWnd)
-    {
-        return FALSE;
-    }
+   if (!hWnd)
+   {
+      return FALSE;
+   }
 
-    ShowWindow(hWnd, nCmdShow);
-    UpdateWindow(hWnd);
+   ShowWindow(hWnd, nCmdShow);
+   UpdateWindow(hWnd);
 
-    return TRUE;
+   return TRUE;
 }
 
 //
@@ -476,6 +488,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     HDC hdc, memdc;
     PAINTSTRUCT ps;
     static BOOL bFlag;
+   
+    
+
     switch (message)
     {
     case WM_SIZE://윈도우 크기 변경할때마다 가져옴
@@ -491,11 +506,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
 
     case WM_TIMER:
-        if (wParam == timer_ID_2)
-        {
-            UpdateFrame(hWnd);
-            InvalidateRgn(hWnd, NULL, TRUE);
-        }
+    if (wParam == timer_ID_2)
+    {
+        UpdateFrame(hWnd);
+        InvalidateRgn(hWnd, NULL, TRUE);
+    }
 
     case WM_PAINT:
         hdc = BeginPaint(hWnd, &ps);
@@ -503,6 +518,169 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         DrawBitmapDoubleBuffering(hWnd, hdc);
         DrawRectText(hdc);
         EndPaint(hWnd, &ps);
+        break;
+    
+    case WM_KEYUP:
+    {
+        int breakpoint = 999;
+        bFlag = FALSE;
+        InvalidateRgn(hWnd, NULL, TRUE);
+    }
+    break;
+
+    case WM_LBUTTONDOWN:
+        DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, Dlg6_1Proc);
+        break;
+
+    case WM_DESTROY:
+        KillTimer(hWnd, timer_ID_2);
+        DestroyBitmap();
+        break;
+    }
+    return (DefWindowProc(hWnd, message, wParam, lParam));
+}
+    /*switch (message)
+    {
+
+    case WM_LBUTTONDOWN:
+    {
+        srand(static_cast<unsigned int>(time(nullptr)));
+
+        int x = LOWORD(lParam);
+        int y = HIWORD(lParam);
+
+        HDC hdc = GetDC(hWnd);
+
+        int shape = rand() % 3;
+        int size = rand() % 100;
+
+        switch (shape)
+            {
+        case 0:
+            Rectangle(hdc, x, y, x + 100, y + 100);
+            break;
+        case 1:
+            Ellipse(hdc, x, y, x + 100, y + 100);
+            break;
+        case 2:
+            POINT center = { x, y };
+            star(hdc, center, size, 5);
+            break;
+        }
+        ReleaseDC(hWnd, hdc);
+        break;
+    }
+
+
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    }
+    return(DefWindowProc(hWnd, message, wParam, lParam));*/
+    /*
+    HDC hdc;
+    PAINTSTRUCT ps;
+    static int x, y, circleRadius;
+    static BOOL selectedMenu;
+    static BOOL bFlag;
+    static BOOL COPY;
+    enum {CIRCLE,RECTANGLE,STAR,NONE};
+    static POINT ptMousePos;
+    static POINT ptCurPos;
+    static RECT rectView;
+    static HMENU hMenu, hSubMenu;
+    OPENFILENAME OFN;
+    TCHAR lpstrFile[100] = _T("");
+    TCHAR filter[] = _T("Every file(*.*) \0*.*\0Text file\0*.txt;*.doc\0");
+
+    switch (message)
+    {
+    case WM_CREATE:
+
+        hMenu = GetMenu(hWnd);
+        hSubMenu = GetSubMenu(hMenu, 2);
+        COPY = FALSE;
+        EnableMenuItem(hSubMenu, ID_EDIT_PASTE, MF_GRAYED);
+        EnableMenuItem(hSubMenu, ID_EDIT_COPY, MF_GRAYED);
+        break;
+
+    case WM_COMMAND:
+       {
+        int wmId = LOWORD(wParam);
+        *switch (wmId)
+            * {
+        *case ID_DRAW_CIRCLE:
+            * {
+                int temp = selectedMenu;
+                int ans = MessageBox(hWnd, _T("원 그릴래?"), _T("도형 선택"), MB_YESNOCANCEL);
+                if (ans == IDYES)
+                {
+                    selectedMenu = CIRCLE;
+                }
+                else if (ans == IDNO)
+                {
+                    selectedMenu = NONE;
+                }
+                else
+                {
+                    selectedMenu = temp;
+                }
+            }
+            selectedMenu = CIRCLE;
+        }
+        break;
+    case ID_DRAW_RECTANGLE:
+        selectedMenu = RECTANGLE;
+        break;
+    case ID_DRAW_STAR:
+        selectedMenu = STAR;
+        break;
+        if (LOWORD(wParam) == ID_EDIT_COPY)
+        {
+            COPY = TRUE;
+            InvalidateRgn(hWnd, NULL, TRUE);
+        }
+        switch (LOWORD(wParam))
+        {
+        case ID_FILEOPEN:
+            memset(&OFN, 0, sizeof(OPENFILENAME));
+            OFN.lStructSize = sizeof(OPENFILENAME);
+            OFN.hwndOwner = hWnd;
+            OFN.lpstrFilter = filter;
+            OFN.lpstrFile = lpstrFile;
+            OFN.nMaxFile = 256;
+            OFN.lpstrInitialDir = _T(".");
+            if (GetOpenFileName(&OFN) != 0)
+                OutFromFile(OFN.lpstrFile, hWnd);
+            break;
+        }
+    }
+        break;
+    case WM_LBUTTONDOWN:
+        ptMousePos.x = LOWORD(lParam);
+        ptMousePos.y = HIWORD(lParam);
+        ptCurPos.x += circleRadius;
+        if (ptCurPos.x + circleRadius > rectView.right)
+            ptCurPos.x = rectView.right - circleRadius;
+
+        if (wParam == VK_RIGHT || wParam == VK_LEFT || wParam == VK_UP || wParam == VK_DOWN)
+        {
+            bFlag = TRUE;
+        }
+
+        if (wParam == 'C' || wParam == 'c')
+        {
+            UINT state = GetMenuState(hSubMenu, ID_EDIT_COPY, MF_BYCOMMAND);
+            if ((state == MF_DISABLED) || (state == MF_GRAYED))
+            {
+                EnableMenuItem(hSubMenu, ID_EDIT_COPY, MF_ENABLED);
+            }
+            else if (state == MF_ENABLED)
+            {
+                EnableMenuItem(hSubMenu, ID_EDIT_COPY, MF_GRAYED);
+            }
+        }
+        InvalidateRgn(hWnd, NULL, TRUE);
         break;
 
     case WM_KEYUP:
@@ -513,229 +691,70 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     break;
 
-    case WM_DESTROY:
-        KillTimer(hWnd, timer_ID_2);
-        DestroyBitmap();
-        break;
-    }
-    return (DefWindowProc(hWnd, message, wParam, lParam));
-}
-/*switch (message)
-{
+    case WM_PAINT:
+        hdc = BeginPaint(hWnd, &ps);
 
-case WM_LBUTTONDOWN:
-{
-    srand(static_cast<unsigned int>(time(nullptr)));
-
-    int x = LOWORD(lParam);
-    int y = HIWORD(lParam);
-
-    HDC hdc = GetDC(hWnd);
-
-    int shape = rand() % 3;
-    int size = rand() % 100;
-
-    switch (shape)
+        switch (selectedMenu)
         {
-    case 0:
-        Rectangle(hdc, x, y, x + 100, y + 100);
-        break;
-    case 1:
-        Ellipse(hdc, x, y, x + 100, y + 100);
-        break;
-    case 2:
-        POINT center = { x, y };
-        star(hdc, center, size, 5);
-        break;
-    }
-    ReleaseDC(hWnd, hdc);
-    break;
-}
-
-
-case WM_DESTROY:
-    PostQuitMessage(0);
-    break;
-}
-return(DefWindowProc(hWnd, message, wParam, lParam));*/
-/*
-HDC hdc;
-PAINTSTRUCT ps;
-static int x, y, circleRadius;
-static BOOL selectedMenu;
-static BOOL bFlag;
-static BOOL COPY;
-enum {CIRCLE,RECTANGLE,STAR,NONE};
-static POINT ptMousePos;
-static POINT ptCurPos;
-static RECT rectView;
-static HMENU hMenu, hSubMenu;
-OPENFILENAME OFN;
-TCHAR lpstrFile[100] = _T("");
-TCHAR filter[] = _T("Every file(*.*) \0*.*\0Text file\0*.txt;*.doc\0");
-
-switch (message)
-{
-case WM_CREATE:
-
-    hMenu = GetMenu(hWnd);
-    hSubMenu = GetSubMenu(hMenu, 2);
-    COPY = FALSE;
-    EnableMenuItem(hSubMenu, ID_EDIT_PASTE, MF_GRAYED);
-    EnableMenuItem(hSubMenu, ID_EDIT_COPY, MF_GRAYED);
-    break;
-
-case WM_COMMAND:
-   {
-    int wmId = LOWORD(wParam);
-    *switch (wmId)
-        * {
-    *case ID_DRAW_CIRCLE:
-        * {
-            int temp = selectedMenu;
-            int ans = MessageBox(hWnd, _T("원 그릴래?"), _T("도형 선택"), MB_YESNOCANCEL);
-            if (ans == IDYES)
-            {
-                selectedMenu = CIRCLE;
-            }
-            else if (ans == IDNO)
-            {
-                selectedMenu = NONE;
-            }
-            else
-            {
-                selectedMenu = temp;
-            }
+        case CIRCLE:
+        {
+            static TCHAR str[100] = L"원";
+            TextOut(hdc, ptMousePos.x, ptMousePos.y, str, _tcslen(str));
         }
-        selectedMenu = CIRCLE;
-    }
-    break;
-case ID_DRAW_RECTANGLE:
-    selectedMenu = RECTANGLE;
-    break;
-case ID_DRAW_STAR:
-    selectedMenu = STAR;
-    break;
-    if (LOWORD(wParam) == ID_EDIT_COPY)
-    {
-        COPY = TRUE;
-        InvalidateRgn(hWnd, NULL, TRUE);
-    }
-    switch (LOWORD(wParam))
-    {
+        break;
+        case RECTANGLE:
+        {
+            static TCHAR str[100] = L"사각형";
+            TextOut(hdc, ptMousePos.x, ptMousePos.y, str, _tcslen(str));
+        }
+        break;
+        case STAR:
+        {
+            static TCHAR str[100] = L"별";
+            TextOut(hdc, ptMousePos.x, ptMousePos.y, str, _tcslen(str));
+        }
+        break;
+        case NONE:
+        {
+            static TCHAR str[100] = L"아무일도 일어나지 않음";
+            TextOut(hdc, ptMousePos.x, ptMousePos.y, str, _tcslen(str));
+        }
+        default:
+            break;
+        }
+        EndPaint(hWnd, &ps);
+        break;
+
+
     case ID_FILEOPEN:
-        memset(&OFN, 0, sizeof(OPENFILENAME));
-        OFN.lStructSize = sizeof(OPENFILENAME);
-        OFN.hwndOwner = hWnd;
-        OFN.lpstrFilter = filter;
-        OFN.lpstrFile = lpstrFile;
-        OFN.nMaxFile = 256;
-        OFN.lpstrInitialDir = _T(".");
-        if (GetOpenFileName(&OFN) != 0)
-            OutFromFile(OFN.lpstrFile, hWnd);
-        break;
-    }
-}
-    break;
-case WM_LBUTTONDOWN:
-    ptMousePos.x = LOWORD(lParam);
-    ptMousePos.y = HIWORD(lParam);
-    ptCurPos.x += circleRadius;
-    if (ptCurPos.x + circleRadius > rectView.right)
-        ptCurPos.x = rectView.right - circleRadius;
-
-    if (wParam == VK_RIGHT || wParam == VK_LEFT || wParam == VK_UP || wParam == VK_DOWN)
     {
-        bFlag = TRUE;
-    }
+        TCHAR filter[] = _T("Every file(*.*) \0*.*\0Text file\0*.txt;*.doc\0");
+        TCHAR lpstrFile[100] = _T("");
 
-    if (wParam == 'C' || wParam == 'c')
-    {
-        UINT state = GetMenuState(hSubMenu, ID_EDIT_COPY, MF_BYCOMMAND);
-        if ((state == MF_DISABLED) || (state == MF_GRAYED))
+        OPENFILENAME ofn;
+        memset(&ofn, 0, sizeof(OPENFILENAME));
+        ofn.lStructSize = sizeof(OPENFILENAME);
+        ofn.hwndOwner = hWnd;
+        ofn.lpstrFilter = filter;
+        ofn.lpstrFile = lpstrFile;
+        ofn.nMaxFile = 100;
+        ofn.lpstrInitialDir = _T(".");
+        if (GetOpenFileName(&ofn) != 0)
         {
-            EnableMenuItem(hSubMenu, ID_EDIT_COPY, MF_ENABLED);
-        }
-        else if (state == MF_ENABLED)
-        {
-            EnableMenuItem(hSubMenu, ID_EDIT_COPY, MF_GRAYED);
+            TCHAR str[100];
+            _stprintf_s(str, _T("%s 파일을 열겠습니까?"), ofn.lpstrFile);
+            MessageBox(hWnd, str, _T("파일 선택"), MB_OK);
         }
     }
-    InvalidateRgn(hWnd, NULL, TRUE);
     break;
-
-case WM_KEYUP:
-{
-    int breakpoint = 999;
-    bFlag = FALSE;
-    InvalidateRgn(hWnd, NULL, TRUE);
-}
-break;
-
-case WM_PAINT:
-    hdc = BeginPaint(hWnd, &ps);
-
-    switch (selectedMenu)
-    {
-    case CIRCLE:
-    {
-        static TCHAR str[100] = L"원";
-        TextOut(hdc, ptMousePos.x, ptMousePos.y, str, _tcslen(str));
-    }
-    break;
-    case RECTANGLE:
-    {
-        static TCHAR str[100] = L"사각형";
-        TextOut(hdc, ptMousePos.x, ptMousePos.y, str, _tcslen(str));
-    }
-    break;
-    case STAR:
-    {
-        static TCHAR str[100] = L"별";
-        TextOut(hdc, ptMousePos.x, ptMousePos.y, str, _tcslen(str));
-    }
-    break;
-    case NONE:
-    {
-        static TCHAR str[100] = L"아무일도 일어나지 않음";
-        TextOut(hdc, ptMousePos.x, ptMousePos.y, str, _tcslen(str));
-    }
-    default:
+    case IDM_ABOUT:
+        DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+    case IDM_EXIT:
+        DestroyWindow(hWnd);
         break;
     }
-    EndPaint(hWnd, &ps);
-    break;
 
-
-case ID_FILEOPEN:
-{
-    TCHAR filter[] = _T("Every file(*.*) \0*.*\0Text file\0*.txt;*.doc\0");
-    TCHAR lpstrFile[100] = _T("");
-
-    OPENFILENAME ofn;
-    memset(&ofn, 0, sizeof(OPENFILENAME));
-    ofn.lStructSize = sizeof(OPENFILENAME);
-    ofn.hwndOwner = hWnd;
-    ofn.lpstrFilter = filter;
-    ofn.lpstrFile = lpstrFile;
-    ofn.nMaxFile = 100;
-    ofn.lpstrInitialDir = _T(".");
-    if (GetOpenFileName(&ofn) != 0)
-    {
-        TCHAR str[100];
-        _stprintf_s(str, _T("%s 파일을 열겠습니까?"), ofn.lpstrFile);
-        MessageBox(hWnd, str, _T("파일 선택"), MB_OK);
-    }
-}
-break;
-case IDM_ABOUT:
-    DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-case IDM_EXIT:
-    DestroyWindow(hWnd);
-    break;
-}
-
-return (DefWindowProc(hWnd, message, wParam, lParam));
+    return (DefWindowProc(hWnd, message, wParam, lParam));
 }
 
 void DrawCircle(HDC hdc, POINT pt, BOOL bFlag)
@@ -744,7 +763,7 @@ void DrawCircle(HDC hdc, POINT pt, BOOL bFlag)
         SelectObject(hdc, GetStockObject(LTGRAY_BRUSH));
 }*/
 
-//void star(HDC hdc, POINT& center, double radius, int n)
+    //void star(HDC hdc, POINT& center, double radius, int n)
 //{
 //    POINT points[10];
 //    double angle = 2.0 * PI / n;
@@ -758,7 +777,78 @@ void DrawCircle(HDC hdc, POINT pt, BOOL bFlag)
 //    Polygon(hdc, points, n);
 //}
 
+//int DialogBox(HINSTANCE hInstance, LPCTSTR lpTemplate, HWND hwnd, DLGPROC);
+//BOOL EndDialog(HWND hDlg, int nResult);
+BOOL CALLBACK Dlg6_1Proc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
+{
+    static HWND hCombo;
+    static int selection;
+    TCHAR name[20];
+    TCHAR word[100];
+    HWND hButton;
 
+
+    switch (iMsg)
+    {
+    case WM_INITDIALOG:
+        hCombo = GetDlgItem(hDlg, IDC_COMBO_LIST);
+        hButton = GetDlgItem(hDlg, IDC_PAUSE);
+        EnableWindow(hButton, FALSE);
+        return 1;
+
+    case WM_COMMAND:
+        switch (LOWORD(wParam))
+        {
+        case IDC_BUTTON_COPY:
+            GetDlgItemText(hDlg, IDC_EDIT_SOURCE, word, 100);
+            SetDlgItemText(hDlg, IDC_BUTTON_COPY, word);
+            break;
+        case IDC_BUTTON_CLEAR:
+            SetDlgItemText(hDlg, IDC_EDIT_SOURCE, _T(""));
+            SetDlgItemText(hDlg, IDC_BUTTON_COPY, _T(""));
+            break;
+        case IDC_START:
+            hButton = GetDlgItem(hDlg, IDC_START);
+            EnableWindow(hButton, FALSE);
+            hButton = GetDlgItem(hDlg, IDC_PAUSE);
+            EnableWindow(hButton, TRUE);
+            break;
+
+        case IDC_PAUSE:
+            hButton = GetDlgItem(hDlg, IDC_START);
+            EnableWindow(hButton, TRUE);
+            hButton = GetDlgItem(hDlg, IDC_PAUSE);
+            EnableWindow(hButton, FALSE);
+            break;
+        case IDCLOSE:
+            EndDialog(hDlg, 0);
+            break;
+
+        case IDC_BUTTON_INSERT:
+            GetDlgItemText(hDlg, IDC_EDIT_NAME, name, 20);
+            if (_tcscmp(name, _T("")))
+                SendMessage(hCombo, CB_ADDSTRING, 0, (LPARAM)name);
+            return 0;
+
+        case IDC_BUTTON_DELETE:
+            SendMessage(hCombo, CB_DELETESTRING, selection, 0);
+            return 0;
+
+        case IDC_COMBO_LIST:
+            if (HIWORD(wParam) == CBN_SELCHANGE)
+                selection = SendMessage(hCombo, CB_GETCURSEL, 0, 0);
+            break;
+
+
+
+        case IDCANCEL:
+            EndDialog(hDlg, 0);
+            return 0;
+        }
+        break;
+    }
+    return 0;
+}
 
 // 정보 대화 상자의 메시지 처리기입니다.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -778,4 +868,5 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
     return (INT_PTR)FALSE;
-};
+}
+

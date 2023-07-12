@@ -34,10 +34,29 @@ void move(int no, int x, int y);
 
 using namespace std;
 
+
 int main()
 {
-
+	//len - s_value = 이동량
+	
+	char txt[30] = "ADGERDEFABC";
+	char pat[30] = "ABC";
+	int pt = strlen(txt);
+	int pp = strlen(pat);
+	cout << "텍스트 : " << txt << endl;
+	cout << "패턴 : " << pat << endl;
+	char* len = strstr(txt, pat);
+	
+	if (len == NULL) cout << "패턴이 없습니다.";
+	else
+	{
+		int movement = len - txt;
+	}
+	
+	
 }
+
+
 	//도수 정렬
 	/*int arr[7] = { 5, 2, 4, 8, 9, 1, 4 };
 
