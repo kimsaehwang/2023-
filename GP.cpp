@@ -40,7 +40,6 @@ void InitializeGame()
     snakeDirection = RIGHT;
     gameOver = false;
 
-
 }
 
 // 키보드 입력 함수
@@ -82,6 +81,18 @@ void UpdateGame()
         break;
     }
 
+
+
+    // 스네이크 자기 자신과 충돌 체크
+    for (int i = 1; i < snakeLength; ++i)
+    {
+        if (snake[0].x == snake[i].x && snake[0].y == snake[i].y)
+        {
+            gameOver = true;
+            break;
+        }
+    }
+
     // 스네이크가 화면을 벗어나는지 체크
     if (snake[0].x < 0 || snake[0].x >= SCREEN_WIDTH ||
         snake[0].y < 0 || snake[0].y >= SCREEN_HEIGHT)
@@ -105,6 +116,13 @@ void DrawGame(HDC hdc)
     for (int i = 0; i < snakeLength; i++)
     {
         Rectangle(hdc, snake[i].x, snake[i].y, snake[i].x + 10, snake[i].y + 10);
+    }
+    // 게임 오버 텍스트 그리기
+    if (gameOver)
+    {
+        SetTextColor(hdc, RGB(255, 255, 255));
+        SetBkMode(hdc, TRANSPARENT);
+        //TextOut(hdc, 10, 10, TEXT("GAME OVER"), 30);
     }
 }
 
@@ -132,7 +150,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hwnd, &ps);
         DrawGame(hdc);
-        
+
         EndPaint(hwnd, &ps);
         break;
     }
@@ -144,8 +162,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 HWND CreateGameWindow(HINSTANCE hInstance)
 {
-    const wchar_t CLASS_NAME[] = L"SnakeGame";
-    const wchar_t WINDOW_NAME[] = L"Snake Game";
+    const wchar_t CLASS_NAME[] = L"G_P";
+    const wchar_t WINDOW_NAME[] = L"G_P";
 
     WNDCLASS wc = {};
     wc.lpfnWndProc = WindowProc;
