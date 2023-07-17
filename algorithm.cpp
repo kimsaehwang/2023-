@@ -2,7 +2,7 @@
 #include <iostream>
 #include "StopWatch.h"
 #include <vector>
-
+#include "LinkedList.h"
 /*
 int int_cmp(const int* a, const int* b)
 {
@@ -37,8 +37,10 @@ using namespace std;
 
 int main()
 {
+
+}
 	//len - s_value = 이동량
-	
+	/*
 	char txt[30] = "ADGERDEFABC";
 	char pat[30] = "ABC";
 	int pt = strlen(txt);
@@ -54,8 +56,7 @@ int main()
 	}
 	
 	
-}
-
+}*/
 
 	//도수 정렬
 	/*int arr[7] = { 5, 2, 4, 8, 9, 1, 4 };
