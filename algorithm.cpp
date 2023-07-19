@@ -3,6 +3,7 @@
 #include "StopWatch.h"
 #include <vector>
 #include "LinkedList.h"
+#include <string>
 /*
 int int_cmp(const int* a, const int* b)
 {
@@ -34,11 +35,48 @@ void move(int no, int x, int y);
 
 using namespace std;
 
+	int main() 
+	{
+		/*
+		학생관리하는 구조체를 생성
+		-번호,이름 멤버를 포함
+		구조체 리스트를 만들어라
+		1.입력 (번호와 이름을 입력받아 리스트에 추가)
+		2.삭제 (해당번호를 입력받아 리스트에 삭제)
+		3.전체 출력(리스트에 있는 학생의 번호와 이름을 출력)
+		*/
 
-int main()
-{
+		int choice;
+		vector<Student> studentList;
+		while (true) 
+		{
+			cout << "1. 학생 추가 | 2. 학생 삭제 | 3. 전체 학생 출력 | 4. 종료\n";
+			cout << "원하는 기능을 선택하세요: ";
+			cin >> choice;
 
-}
+			switch (choice) 
+			{
+			case 1:
+				addStudent(studentList);
+				break;
+			case 2:
+				removeStudent(studentList);
+				break;
+			case 3:
+				printAllStudents(studentList);
+				break;
+			case 4:
+				cout << "프로그램을 종료합니다.\n";
+				return 0;
+			default:
+				cout << "잘못 선택 했습니다.\n";
+				break;
+			}
+		}
+		return 0;
+	}
+	
+	
 	//len - s_value = 이동량
 	/*
 	char txt[30] = "ADGERDEFABC";
