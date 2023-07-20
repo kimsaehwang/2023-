@@ -1,26 +1,26 @@
 #include "LinkedList.h"
 #include <iostream>
+#include<string>
 
 using namespace std;
 
-// 학생 추가 
-void addStudent(vector<Student>& studentList) 
+void addStudent(Student studentList[], int& numStudents) 
 {
     Student newStudent;
     cout << "학생 번호를 입력하세요: ";
     cin >> newStudent.number;
     cout << "학생 이름을 입력하세요: ";
-    cin.ignore(); 
+    cin.ignore();
     getline(cin, newStudent.name);
-    studentList.push_back(newStudent);
+    studentList[numStudents] = newStudent;
+    numStudents++;
 
     cout << "학생 정보가 추가되었습니다.\n";
 }
 
-// 학생 삭제 
-void removeStudent(vector<Student>& studentList)
+void removeStudent(Student studentList[], int& numStudents) 
 {
-    if (studentList.empty()) 
+    if (numStudents == 0) 
     {
         cout << "삭제할 학생 정보가 없습니다.\n";
         return;
@@ -30,34 +30,57 @@ void removeStudent(vector<Student>& studentList)
     cout << "삭제할 학생의 번호를 입력하세요: ";
     cin >> targetNumber;
 
-    for (size_t i = 0; i < studentList.size(); i++) 
+    int foundIndex = -1;
+    for (int i = 0; i < numStudents; i++) 
     {
-        if (studentList[i].number == targetNumber) 
+        if (studentList[i].number == targetNumber)
         {
-            studentList.erase(studentList.begin() + i);
-            cout << "학생 정보가 삭제되었습니다.\n";
-            return;
+            foundIndex = i;
+            break;
         }
     }
 
-    cout << "해당 번호의 학생을 찾을 수 없습니다.\n";
+    if (foundIndex == -1)
+    {
+        cout << "해당 번호의 학생을 찾을 수 없습니다.\n";
+        return;
+    }
+
+    for (int i = foundIndex; i < numStudents - 1; i++) 
+    {
+        studentList[i] = studentList[i + 1];
+    }
+
+    numStudents--;
+    cout << "학생 정보가 삭제되었습니다.\n";
 }
 
-// 전체 학생 출력 
-void printAllStudents(const vector<Student>& studentList)
+void printAllStudents1(Student studentList[], int& numStudents)
 {
-    if (studentList.empty())
+    if (numStudents == 0)
     {
         cout << "출력할 학생 정보가 없습니다.\n";
         return;
     }
-
-    cout << "\n전체 학생 정보\n";
-    for (const auto& student : studentList) 
+    cout << "정방향 출력(1) 역방향출력(2) :";
+    cout << "\n----- 전체 학생 정보 -----\n";
+    for (int i = 0; i < numStudents; i++) 
     {
-        cout << "번호: " << student.number << ", 이름: " << student.name << endl;
+        cout << "번호: " << studentList[i].number << ", 이름: " << studentList[i].name << endl;
     }
-    cout << endl;
 }
-
+void printAllStudents2(Student studentList[], int& numStudents)
+{
+    if (numStudents == 0)
+    {
+        cout << "출력할 학생 정보가 없습니다.\n";
+        return;
+    }
+    cout << "정방향 출력(1) 역방향출력(2) :";
+    cout << "\n----- 전체 학생 정보 -----\n";
+    for (int i = numStudents; i > 0;i--)
+    {
+        cout << "번호: " << studentList[i].number << ", 이름: " << studentList[i].name << endl;
+    }
+}
 

@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "WinApiPoj.h"
+//#include "WinApiPoj.h"
 #include "resource.h"
 #include <commdlg.h>
 #include<cmath>
@@ -12,9 +12,12 @@
 #else
 #pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
 #endif
-const int WINDOW_WIDTH = 500;
-const int WINDOW_HEIGHT = 600;
-const int CIRCLE_RADIUS = 10;
+#include <iostream>
+
+using namespace std;
+const int WINDOW_WIDTH = 1080;
+const int WINDOW_HEIGHT = 1500;
+const int CIRCLE_RADIUS = 5;
 const int MOVE_STEP = 5;
 
 RECT rectView;
@@ -105,7 +108,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
     HWND hWnd = CreateWindowW(szWindowClass, _T("GalsPanic"), WS_OVERLAPPEDWINDOW,
-        200, 200, 500, 600, nullptr, nullptr, hInstance, nullptr);
+        200, 200, 700, 800, nullptr, nullptr, hInstance, nullptr);
 
     if (!hWnd)
     {
@@ -132,6 +135,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static bool flag;
     static RECT rectView;
+    PAINTSTRUCT ps;
+    HDC hdc = BeginPaint(hWnd, &ps);
     switch (message) 
     {
     case WM_CREATE:
@@ -139,17 +144,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         xPos = 10;
         yPos = 10;
         break;
+
     case WM_PAINT:
     {
-        PAINTSTRUCT ps;
-        HDC hdc = BeginPaint(hWnd, &ps);
-
-        // 그리기 작업
+        Rectangle(hdc, 5, 5, 690, 735);
         if (flag)
-            SelectObject(hdc, GetStockObject(LTGRAY_BRUSH));
+            SelectObject(hdc, GetStockObject(BLACK_BRUSH));
         Ellipse(hdc, xPos - CIRCLE_RADIUS, yPos - CIRCLE_RADIUS, xPos + CIRCLE_RADIUS, yPos + CIRCLE_RADIUS);
 
-        // 선 그리기 작업
         if (!pathPoints.empty()) 
         {
             MoveToEx(hdc, pathPoints[0].x, pathPoints[0].y, NULL);
@@ -164,47 +166,62 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_KEYDOWN:
         flag = true;
-
-
-
         switch (wParam)
         {
         case VK_LEFT:
             xPos -= MOVE_STEP;
+            if (xPos < CIRCLE_RADIUS)
+            {
+                xPos = CIRCLE_RADIUS;
+                cout << "LEFT end" << endl;
+            }
             break;
         case VK_RIGHT:
             xPos += MOVE_STEP;
+            if (xPos > rectView.right - CIRCLE_RADIUS)
+            {
+                xPos = rectView.right - CIRCLE_RADIUS;
+                cout << "RIGHT end" << endl;
+            }
             break;
         case VK_UP:
             yPos -= MOVE_STEP;
+            if (yPos < CIRCLE_RADIUS)
+            {
+                yPos = CIRCLE_RADIUS;
+                cout << "UP end" << endl;
+            }
             break;
         case VK_DOWN:
             yPos += MOVE_STEP;
+            if (yPos > rectView.bottom - CIRCLE_RADIUS)
+            {
+                yPos = rectView.bottom - CIRCLE_RADIUS;
+                cout << "DOWN end" << endl;
+            }
             break;
         default:
             break;
         }
 
-        // 원의 이동 경로를 저장
         POINT point;
         point.x = xPos;
         point.y = yPos;
         pathPoints.push_back(point);
 
-        // 윈도우를 다시 그리도록 요청
         if (wParam == VK_RIGHT)
         {
             SetTimer(hWnd, 1, 70, NULL);
-            xPos += 40;
-            if (xPos + 20 > rectView.right)xPos -= 40;
         }
         InvalidateRect(hWnd, NULL, TRUE);
         break;
+
         
     case WM_KEYUP:
         flag = false;
         InvalidateRgn(hWnd, NULL, TRUE);
         break;
+
     case WM_TIMER:
         InvalidateRgn(hWnd, NULL, TRUE);
         break;

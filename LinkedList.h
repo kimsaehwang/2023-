@@ -2,16 +2,18 @@
 #define STUDENT
 
 #include <string>
-#include <vector>
+
+const int MAX_STUDENTS = 100;
 
 struct Student {
     int number;
     std::string name;
 };
 
-void addStudent(std::vector<Student>& studentList);
-void removeStudent(std::vector<Student>& studentList);
-void printAllStudents(const std::vector<Student>& studentList);
+void addStudent(Student studentList[], int& numStudents);
+void removeStudent(Student studentList[], int& numStudents);
+void printAllStudents1(Student studentList[], int& numStudents);
+void printAllStudents2(Student studentList[], int& numStudents);
 
 #endif 
 

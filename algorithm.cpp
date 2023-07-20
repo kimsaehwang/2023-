@@ -1,6 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
-#include "StopWatch.h"
+//#include "StopWatch.h"
 #include <vector>
 #include "LinkedList.h"
 #include <string>
@@ -45,9 +45,9 @@ using namespace std;
 		2.삭제 (해당번호를 입력받아 리스트에 삭제)
 		3.전체 출력(리스트에 있는 학생의 번호와 이름을 출력)
 		*/
-
-		int choice;
-		vector<Student> studentList;
+		Student studentList[MAX_STUDENTS];
+		int numStudents = 0;
+		int choice,rev;
 		while (true) 
 		{
 			cout << "1. 학생 추가 | 2. 학생 삭제 | 3. 전체 학생 출력 | 4. 종료\n";
@@ -57,14 +57,23 @@ using namespace std;
 			switch (choice) 
 			{
 			case 1:
-				addStudent(studentList);
+				addStudent(studentList, numStudents);
 				break;
 			case 2:
-				removeStudent(studentList);
+				removeStudent(studentList, numStudents);
 				break;
 			case 3:
-				printAllStudents(studentList);
-				break;
+				cin >> rev;
+				switch (rev)
+				{
+				case 1:
+					printAllStudents1(studentList, numStudents);
+					break;
+				case 2:
+					printAllStudents2(studentList, numStudents);
+					break;
+				}
+			
 			case 4:
 				cout << "프로그램을 종료합니다.\n";
 				return 0;
