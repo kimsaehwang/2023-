@@ -13,7 +13,7 @@ struct Student {
 void addStudent(Student studentList[], int& numStudents);
 void removeStudent(Student studentList[], int& numStudents);
 void printAllStudents1(Student studentList[], int& numStudents);
-void printAllStudents2(Student studentList[], int& numStudents);
+void searchStudent(Student studentList[], int& numStudents);
 
 #endif 
 
