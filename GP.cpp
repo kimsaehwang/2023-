@@ -7,6 +7,7 @@
 #include<stdio.h>
 #include<windowsx.h>
 #include <vector>
+#include "WinApiPoj.h"
 #ifdef UNICODE
 #pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
 #else

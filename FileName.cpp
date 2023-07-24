@@ -1,51 +1,61 @@
-#include <windows.h>
-
-// 전역 변수
-int x = 0;
-int y = 0;
-
-// 윈도우 프로시저
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+#define MAX_THREAD_NUM 50
+int XPOS, YPOS;
+int r, g, b;
+LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
-    PAINTSTRUCT ps;
     HDC hdc;
+    PAINTSTRUCT ps;
+    static HANDLE hThread[MAX_THREAD_NUM];
+    static int count = 0;
+    static RECT rt;
 
-    switch (message) {
-    case WM_PAINT:
-        hdc = BeginPaint(hWnd, &ps);
-        // 현재 위치에서 이전 위치로 선 그리기
-        MoveToEx(hdc, 0, 0, NULL);
-        LineTo(hdc, x, y);
-        EndPaint(hWnd, &ps);
+    switch (iMsg)
+    {
+    case WM_CREATE:
+        GetClientRect(hwnd, &rt);
         break;
 
-    case WM_KEYDOWN:
-        switch (wParam) {
-        case VK_LEFT:
-            x -= 10;
-            break;
-        case VK_UP:
-            y -= 10;
-            break;
-        case VK_RIGHT:
-            x += 10;
-            break;
-        case VK_DOWN:
-            y += 10;
-            break;
-        }
-        // WM_PAINT 메시지를 다시 보내서 화면을 업데이트
-        InvalidateRect(hWnd, NULL, TRUE);
+    case WM_LBUTTONDOWN:
+        XPOS = rand() % rt.right;
+        YPOS = rand() % rt.bottom;
+        r = rand() % 256;
+        g = rand() % 256;
+        b = rand() % 256;
+        hThread[count] = (HANDLE)_beginthreadex(NULL, 0, (unsigned int(__stdcall*)(void*))ThreadProc, NULL, 0, NULL);
+        count++;
         break;
-
     case WM_DESTROY:
+        for (int i = 0; i < MAX_THREAD_NUM; i++)
+            CloseHandle(hThread[i]);
         PostQuitMessage(0);
         break;
 
-    default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
     }
-    return 0;
+    return DefWindowProc(hwnd, iMsg, wParam, lParam);
 }
+void ThreadProc()
+{
+    HDC hdc;
+    //srand(time(NULL));
+    int xPos, yPos;
+
+    hdc = GetDC(hwnd);
+    xPos = XPOS;
+    yPos = YPOS;
+    SelectObject(hdc, CreateSolidBrush(RGB(r, g, b)));
+    Ellipse(hdc, xPos - 10, yPos - 10, xPos + 10, yPos + 10);
+    for (int i = 0; i < 10; i++)
+    {
+        Sleep(1000);
+        Ellipse(hdc, xPos - 10, yPos - 10, xPos + 10, yPos + 10);
+        SelectObject(hdc, CreateSolidBrush(RGB(rand() % 256, rand() % 256, rand() % 256)));
 
 
+
+
+    }
+    ReleaseDC(hwnd, hdc);
+    return;
+}
+Colored by Color Scripter
+cs
