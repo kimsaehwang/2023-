@@ -4,6 +4,7 @@
 #include<process.h>
 #include <cmath>
 #include <windowsx.h>
+#include <Windows.h>
 
 #define MAX_LOADSTRING 100
 
@@ -209,53 +210,63 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //    }
 //    return 0;
 //}
-#include <windows.h>
-#include <process.h>
 
 #define THREAD_NUM 50
-
 int xPos, yPos;
-COLORREF circleColor;
+COLORREF circleColor = RGB(0, 0, 0);
+bool drawCircle = false;
+CRITICAL_SECTION cs;
+BOOL isDrawing = FALSE;
 
 unsigned int __stdcall ThFunc(void*)
 {
     HDC hdc = GetDC(NULL);
-    SelectObject(hdc, CreateSolidBrush(circleColor));
-    for (int i = 0; i < 10; i++)
+    HBRUSH hBrush = NULL; 
+    SelectObject(hdc, CreateSolidBrush(RGB(rand() % 256, rand() % 256, rand() % 256)));
+    while (drawCircle)
     {
-        Sleep(100);
-        Ellipse(hdc, xPos - 10, yPos - 10, xPos + 10, yPos + 10);
-        circleColor = RGB(rand() % 256, rand() % 256, rand() % 256);
+        EnterCriticalSection(&cs);
+        {
+            Ellipse(hdc, xPos - 10, yPos - 10, xPos + 10, yPos + 10);
+        }
+        LeaveCriticalSection(&cs);
+        Sleep(1000);
     }
-    ReleaseDC(NULL, hdc);
     return 0;
 }
 
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    static HANDLE hThread[THREAD_NUM];
-    static int count = 0;
-    static RECT rt;
-
+    static HANDLE hThread;
+    DWORD dwThIDs;
+    int count =0;
+    HDC hdc = GetDC(hWnd);
     switch (message)
     {
     case WM_CREATE:
-        GetClientRect(hWnd, &rt);
-        break;
+        InitializeCriticalSection(&cs);
+    break;
+
     case WM_LBUTTONDOWN:
     {
-        xPos = GET_X_LPARAM(lParam);
-        yPos = GET_Y_LPARAM(lParam);
-        circleColor = RGB(rand() % 256, rand() % 256, rand() % 256);
-        InvalidateRect(hWnd, NULL, TRUE);
-
-        if (count < THREAD_NUM)
+        if (!isDrawing)
         {
-            hThread[count] = (HANDLE)_beginthreadex(NULL, 0, ThFunc, NULL, 0, NULL);
-            count++;
+            xPos = GET_X_LPARAM(lParam);
+            yPos = GET_Y_LPARAM(lParam);
+            drawCircle = TRUE;
+            InvalidateRect(hWnd, NULL, FALSE);
+
+            if (count < THREAD_NUM)
+            {
+                Ellipse(hdc, xPos - 10, yPos - 10, xPos + 10, yPos + 10);
+                hThread = (HANDLE)_beginthreadex(NULL, 0, ThFunc, NULL, 0, NULL);
+                count++;
+            }
         }
     }
     break;
+
     case WM_COMMAND:
     {
         // 메뉴 선택을 구문 분석합니다:
@@ -272,18 +283,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
     }
     break;
+
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
-        SelectObject(hdc, CreateSolidBrush(circleColor));
-        Ellipse(hdc, xPos - 10, yPos - 10, xPos + 10, yPos + 10);
         EndPaint(hWnd, &ps);
     }
     break;
+
     case WM_DESTROY:
-        for (int i = 0; i < THREAD_NUM; i++)
-            CloseHandle(hThread[i]);
+        CloseHandle(hThread);
+        DeleteCriticalSection(&cs);
         PostQuitMessage(0);
         break;
     default:
