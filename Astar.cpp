@@ -1,27 +1,22 @@
 #include "framework.h"
 #include "WinApiPoj.h"
-#include <time.h>
-#include<process.h>
-#include <cmath>
-#include <windowsx.h>
-#include <Windows.h>
 
 #define MAX_LOADSTRING 100
 
 // 전역 변수:
-HWND hWnd;
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
+//
+void Drawgrid();
+//
+ 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-unsigned __stdcall ThFunc(LPVOID lpParam);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -127,105 +122,43 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
 //
-
-#define THREAD_NUM 50
-
-int xPos, yPos;
-CRITICAL_SECTION cs;
-BOOL isDrawing = FALSE;
-HANDLE hThread[THREAD_NUM] = { 0 };
-
-unsigned int __stdcall ThFunc(LPVOID lpParam)
-{
-    HWND hWnd = (HWND)lpParam;
-    int red, green, blue;
-
-    while (1)
-    {
-        HBRUSH hBrush = CreateSolidBrush(RGB(rand() % 256, rand() % 256, rand() % 256));
-        HDC hdc = GetDC(hWnd);
-
-        EnterCriticalSection(&cs);
-        int x = xPos;
-        int y = yPos;
-        LeaveCriticalSection(&cs);
-
-        SelectObject(hdc, CreateSolidBrush(RGB(rand() % 256, rand() % 256, rand() % 256)));
-        Ellipse(hdc, x - 10, y - 10, x + 10, y + 10);
-        DeleteObject(hBrush);
-        ReleaseDC(hWnd, hdc);
-        Sleep(1000);
-    }
-    return 0;
-}
-
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    static int threadCount = 0;
-    HDC hdc = GetDC(hWnd);
     switch (message)
     {
-    case WM_CREATE:
-        InitializeCriticalSection(&cs);
-        break;
-
-    case WM_LBUTTONDOWN:
-    {
-        if (threadCount < THREAD_NUM)
-        {
-            xPos = GET_X_LPARAM(lParam);
-            yPos = GET_Y_LPARAM(lParam);
-            hThread[threadCount] = (HANDLE)_beginthreadex(NULL, 0, (unsigned(__stdcall*)(void*))ThFunc, hWnd, 0, NULL); // Pass hWnd to ThFunc
-            threadCount++;
-        }
-    }
-    break;
-
     case WM_COMMAND:
     {
+        int wmId = LOWORD(wParam);
         // 메뉴 선택을 구문 분석합니다:
-        switch (LOWORD(wParam))
+        switch (wmId)
         {
         case IDM_ABOUT:
-              DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
+            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+            break;
         case IDM_EXIT:
-               DestroyWindow(hWnd);
-               break;
-           default:
-           return DefWindowProc(hWnd, message, wParam, lParam);
+            DestroyWindow(hWnd);
+            break;
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
         }
     }
     break;
-
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
+        // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
         EndPaint(hWnd, &ps);
     }
     break;
-
     case WM_DESTROY:
-    {
-        for (int i = 0; i < THREAD_NUM; i++)
-        {
-            if (hThread[i] != NULL)
-            {
-                CloseHandle(hThread[i]);
-            }
-        }
-        DeleteCriticalSection(&cs);
         PostQuitMessage(0);
-    }
-    break;
-
+        break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
     return 0;
 }
-
 
 // 정보 대화 상자의 메시지 처리기입니다.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -247,5 +180,7 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return (INT_PTR)FALSE;
 }
 
+void Drawgrid()
+{
 
-
+}
