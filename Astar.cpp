@@ -1,6 +1,11 @@
 #include "framework.h"
 #include "WinApiPoj.h"
-
+#include <time.h>
+#include<process.h>
+#include <cmath>
+#include <Windows.h>
+#include "AStar.h"
+#include <windowsx.h>
 #define MAX_LOADSTRING 100
 
 // 전역 변수:
@@ -9,7 +14,9 @@ WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
 //
-void Drawgrid();
+void DrawMap(HWND hWnd);
+void DrawPlayer();
+void InitializeCellColors();
 //
  
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
@@ -121,7 +128,53 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_PAINT    - 주 창을 그립니다.
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
-//
+
+#define X_COUNT 19
+#define Y_COUNT 19
+#define START_X 50
+#define START_Y 50
+#define INTERVAL 30
+#define XPOS(x) (START_X +(x) *INTERVAL)
+#define YPOS(y) (START_Y +(y) *INTERVAL)
+
+void DrawMap(HWND hWnd)
+{
+    PAINTSTRUCT ps;
+    HDC hdc = BeginPaint(hWnd, &ps);
+    for (int x = 0;x < X_COUNT;x++)
+    {
+        MoveToEx(hdc, XPOS(x), YPOS(0), NULL);
+        LineTo(hdc, XPOS(x), YPOS(Y_COUNT - 1));
+    }
+    for (int y = 0;y < Y_COUNT;y++)
+    {
+        MoveToEx(hdc, XPOS(0), YPOS(y), NULL);
+        LineTo(hdc, XPOS(X_COUNT - 1), YPOS(y));
+    }
+    EndPaint(hWnd, &ps);
+}
+
+void DrawPlayer()
+{
+
+}
+
+COLORREF cellColors[X_COUNT][Y_COUNT];
+COLORREF defaultColor = RGB(255, 255, 255); // White
+COLORREF clickedColor = RGB(255, 0, 0); // Red
+
+void InitializeCellColors()
+{
+    for (int x = 0; x < X_COUNT; x++)
+    {
+        for (int y = 0; y < Y_COUNT; y++)
+        {
+            cellColors[x][y] = defaultColor;
+        }
+    }
+}
+
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -143,14 +196,31 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
     }
     break;
+
     case WM_PAINT:
     {
-        PAINTSTRUCT ps;
-        HDC hdc = BeginPaint(hWnd, &ps);
-        // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-        EndPaint(hWnd, &ps);
+        DrawMap(hWnd);
     }
     break;
+
+    case WM_LBUTTONDOWN:
+    {
+        int xPos = GET_X_LPARAM(lParam);
+        int yPos = GET_Y_LPARAM(lParam);
+        int xCell = (xPos - START_X) / INTERVAL;
+        int yCell = (yPos - START_Y) / INTERVAL;
+        if (xCell >= 0 && xCell < X_COUNT && yCell >= 0 && yCell < Y_COUNT)
+        {
+            cellColors[xCell][yCell] = clickedColor;
+            InvalidateRect(hWnd, NULL, TRUE);
+        }
+    }
+    break;
+
+    case WM_CREATE:
+        InitializeCellColors();
+        break;
+
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
@@ -159,6 +229,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     return 0;
 }
+
+
 
 // 정보 대화 상자의 메시지 처리기입니다.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -178,9 +250,4 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
     return (INT_PTR)FALSE;
-}
-
-void Drawgrid()
-{
-
 }
